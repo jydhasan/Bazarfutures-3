@@ -5,6 +5,7 @@ Runs daily via APScheduler.
 """
 import logging
 import re
+from difflib import SequenceMatcher
 import httpx
 from bs4 import BeautifulSoup
 from decimal import Decimal
@@ -14,7 +15,7 @@ import models
 from database import SessionLocal
 from config import get_settings
 
-logger   = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
@@ -33,14 +34,23 @@ def _normalize_text(value: str) -> str:
 
 
 def _name_match_score(target: str, candidate: str) -> float:
-    t = set(_normalize_text(target).split())
-    c = set(_normalize_text(candidate).split())
+    target_n = _normalize_text(target)
+    cand_n = _normalize_text(candidate)
+    t = set(target_n.split())
+    c = set(cand_n.split())
     if not t or not c:
         return 0.0
     inter = len(t & c)
-    if inter == 0:
-        return 0.0
-    return inter / max(len(t), len(c))
+    token_score = inter / max(len(t), len(c))
+
+    # bonus for partial contain (e.g. "bashundhara" present in long names)
+    contains_bonus = 0.0
+    if target_n and cand_n and (target_n in cand_n or cand_n in target_n):
+        contains_bonus = 0.25
+
+    # fuzzy backup for minor spelling/format differences
+    fuzzy = SequenceMatcher(None, target_n, cand_n).ratio()
+    return max(token_score + contains_bonus, fuzzy * 0.6)
 
 
 def _parse_price_from_html(html: str) -> Decimal | None:
@@ -68,6 +78,8 @@ def _parse_price_from_html(html: str) -> Decimal | None:
     for sel in selectors:
         el = soup.select_one(sel)
         if el:
+            text = el.get_text(strip=True).replace(
+                "৳", "").replace(",", "").strip()
             text = el.get_text(" ", strip=True).replace("৳", "").strip()
             price = _extract_number(text)
             if price is not None:
@@ -81,10 +93,14 @@ def _parse_price_from_html(html: str) -> Decimal | None:
         match = re.search(r'"price"\s*:\s*"?(?P<price>\d+(?:\.\d+)?)"?', txt)
         if match:
             try:
+                return Decimal(text)
                 return Decimal(match.group("price"))
             except Exception:
                 continue
     return None
+
+
+async def fetch_price_from_chaldal(url: str) -> Decimal | None:
 
 
 def _extract_price_from_catalog_card(card) -> Decimal | None:
@@ -93,7 +109,8 @@ def _extract_price_from_catalog_card(card) -> Decimal | None:
     if discounted:
         # current/discounted price is typically the first direct span
         for el in discounted.find_all("span", recursive=False):
-            text = el.get_text(" ", strip=True).replace("৳", "").replace(",", "")
+            text = el.get_text(" ", strip=True).replace(
+                "৳", "").replace(",", "")
             m = re.search(r"(\d+(?:\.\d{1,2})?)", text)
             if m:
                 return Decimal(m.group(1))
@@ -118,7 +135,8 @@ def _parse_price_from_search_results(html: str, target_name: str) -> Decimal | N
     best_price = None
     best_score = 0.0
     for card in cards:
-        name_el = card.select_one(".pvName .nameTextWithEllipsis") or card.select_one(".pvName")
+        name_el = card.select_one(
+            ".pvName .nameTextWithEllipsis") or card.select_one(".pvName")
         candidate_name = name_el.get_text(" ", strip=True) if name_el else ""
         score = _name_match_score(target_name, candidate_name)
         if score <= best_score:
@@ -130,8 +148,11 @@ def _parse_price_from_search_results(html: str, target_name: str) -> Decimal | N
         best_score = score
 
     # avoid accidental mismatch when URL returns unrelated list
-    if best_score >= 0.34:
+    if best_score >= 0.16:
         return best_price
+    # fallback: if name match is weak but there is only one obvious priced card
+    if len(cards) == 1:
+        return _extract_price_from_catalog_card(cards[0])
     return None
 
 
@@ -142,7 +163,8 @@ async def fetch_price_from_chaldal(url: str, product_name: str | None = None) ->
             resp = await client.get(url)
             if resp.status_code == 200:
                 if product_name:
-                    from_search = _parse_price_from_search_results(resp.text, product_name)
+                    from_search = _parse_price_from_search_results(
+                        resp.text, product_name)
                     if from_search is not None:
                         return from_search
                 return _parse_price_from_html(resp.text)
@@ -169,6 +191,7 @@ def run_price_update():
             )
             .all()
         )
+        logger.info(f"Starting price update for {len(products)} products...")
         total_products = len(products)
         logger.info(f"Starting price update for {total_products} products...")
 
@@ -177,6 +200,7 @@ def run_price_update():
             failed = 0
             checked = 0
             for product in products:
+                price = await fetch_price_from_chaldal(product.chaldal_url)
                 if not product.chaldal_url:
                     continue
                 checked += 1
@@ -184,7 +208,8 @@ def run_price_update():
                 price = await fetch_price_from_chaldal(product.chaldal_url, lookup_name)
                 if price is None:
                     failed += 1
-                    logger.warning(f"  No price found for: {product.name_en} ({product.chaldal_url})")
+                    logger.warning(
+                        f"  No price found for: {product.name_en} ({product.chaldal_url})")
                     continue
                 if price and price != product.current_price:
                     old = product.current_price
@@ -198,7 +223,10 @@ def run_price_update():
                     updated += 1
                     logger.info(f"  {product.name_en}: ৳{old} → ৳{price}")
             db.commit()
-            logger.info(f"Price update complete. {updated}/{checked} changed, {failed} failed.")
+            logger.info(
+                f"Price update complete. {updated}/{len(products)} changed.")
+            logger.info(
+                f"Price update complete. {updated}/{checked} changed, {failed} failed.")
             return {
                 "total_products": total_products,
                 "checked": checked,
@@ -206,6 +234,7 @@ def run_price_update():
                 "failed": failed,
             }
 
+        asyncio.run(_update_all())
         return asyncio.run(_update_all())
 
     except Exception as e:
@@ -243,56 +272,3 @@ def run_settlement_job():
             )
             .all()
         )
-        logger.info(f"Settlement job: {len(contracts)} contracts to settle.")
-
-        for contract in contracts:
-            product = db.query(models.Product).filter(models.Product.id == contract.product_id).first()
-            seller  = db.query(models.User).filter(models.User.id == contract.seller_id).first()
-            buyer   = db.query(models.User).filter(models.User.id == contract.buyer_id).first()
-            if not (product and seller and buyer):
-                continue
-
-            market_price    = product.current_price
-            price_diff      = contract.contract_price - market_price
-            gross_pnl       = price_diff * contract.quantity
-            commission      = (abs(gross_pnl) * Decimal(str(cfg.PLATFORM_COMMISSION_RATE))).quantize(Decimal("0.01"))
-            net_pnl         = gross_pnl - (commission if gross_pnl > 0 else -commission)
-            security        = contract.security_amount
-
-            def add_txn(uid, cid, ttype, amt, note):
-                db.add(models.Transaction(
-                    user_id=uid, contract_id=cid,
-                    txn_type=ttype, amount=abs(amt),
-                    status=models.TransactionStatus.completed, note=note,
-                ))
-
-            if net_pnl >= 0:
-                seller_r = security + net_pnl
-                buyer_r  = max(security - net_pnl, Decimal("0"))
-                seller.frozen_balance -= security; seller.balance += seller_r
-                buyer.frozen_balance  -= security; buyer.balance  += buyer_r
-                add_txn(seller.id, contract.id, models.TransactionType.settlement_gain, net_pnl, "Auto settlement gain")
-                add_txn(buyer.id,  contract.id, models.TransactionType.settlement_loss, net_pnl, "Auto settlement loss")
-            else:
-                loss     = abs(net_pnl)
-                buyer_r  = security + loss
-                seller_r = max(security - loss, Decimal("0"))
-                buyer.frozen_balance  -= security; buyer.balance  += buyer_r
-                seller.frozen_balance -= security; seller.balance += seller_r
-                add_txn(buyer.id,  contract.id, models.TransactionType.settlement_gain, loss, "Auto settlement gain")
-                add_txn(seller.id, contract.id, models.TransactionType.settlement_loss, loss, "Auto settlement loss")
-
-            contract.status           = models.ContractStatus.settled
-            contract.settlement_price = market_price
-            contract.pnl              = gross_pnl
-            contract.settled_at       = datetime.now(timezone.utc)
-            logger.info(f"  Settled {contract.contract_code} — PnL: ৳{gross_pnl}")
-
-        db.commit()
-        logger.info("Settlement job done.")
-
-    except Exception as e:
-        logger.error(f"Settlement job failed: {e}")
-        db.rollback()
-    finally:
-        db.close()
