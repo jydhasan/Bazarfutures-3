@@ -103,6 +103,7 @@ const A = {
   toggleUser: id => api(`/admin/users/${id}/toggle`, {method:'PATCH'}),
   scrape:     () => api('/admin/trigger-scrape',     {method:'POST'}),
   settle:     () => api('/admin/trigger-settlement', {method:'POST'}),
+  fetchPreview: () => api('/admin/fetch-preview'),   // GET — no DB write
 };
 
 /* ═══ CACHE ═════════════════════════════════════ */
@@ -153,11 +154,66 @@ function buildTicker(prods) {
   const track = document.getElementById('tickerTrack');
   if (!track) return;
   const items = prods.slice(0, 18).map(p => {
-    const chg = p.oldPrice ? p.price - p.oldPrice : 0;
-    const cls = chg < 0 ? 'dn' : chg > 0 ? 'up' : '';
-    return `<div class="tick-item"><span>${p.name}</span><span class="tp">৳${p.price}</span>${chg!==0?`<span class="${cls}">${chg>0?'+':''}${chg.toFixed(0)}</span>`:''}</div>`;
+    const chg  = p.oldPrice ? p.price - p.oldPrice : 0;
+    const cls  = chg < 0 ? 'dn' : chg > 0 ? 'up' : '';
+    const icon = getProdIcon(p.name);
+    return `<div class="tick-item"><span>${icon} ${p.name}</span><span class="tp">৳${p.price}</span>${chg!==0?`<span class="${cls}">${chg>0?'+':''}${chg.toFixed(0)}</span>`:''}</div>`;
   }).join('');
   track.innerHTML = items + items;
+}
+
+/* ═══ PRODUCT ICON MAP ══════════════════════════ */
+const PROD_ICONS = {
+  // সবজি
+  'আলু': '🥔', 'লাল আলু': '🥔', 'বড় আলু': '🥔', 'মিষ্টি আলু': '🍠',
+  'টমেটো': '🍅', 'লাল টমেটো': '🍅',
+  'ফুলকপি': '🥦', 'বাঁধাকপি': '🥬',
+  'গাজর': '🥕', 'শসা': '🥒',
+  'পেঁয়াজ': '🧅', 'রসুন': '🧄',
+  'কাঁচা মরিচ': '🌶️', 'শুকনো মরিচ': '🌶️',
+  'লাল শাক': '🥬', 'পালং শাক': '🥬',
+  'ধনিয়া পাতা': '🌿', 'করলা': '🥒',
+  'বেগুন': '🍆', 'কুমড়া': '🎃',
+  'আদা': '🫚', 'ক্যাপসিকাম': '🫑', 'শিম': '🫘',
+  // ফল
+  'কলা': '🍌', 'পেয়ারা': '🍐', 'লেবু': '🍋', 'মাল্টা': '🍊',
+  'আঙুর': '🍇', 'পেঁপে': '🍈', 'আম': '🥭', 'আপেল': '🍎',
+  // ডাল/চাল
+  'চাল': '🌾', 'আটা': '🌾', 'ময়দা': '🌾',
+  'ডাল': '🫘', 'ছোলা': '🫘', 'মুগ': '🫘', 'মসুর': '🫘',
+  'চিড়া': '🌾', 'মুড়ি': '🌾',
+  // মশলা / তেল
+  'সরিষার তেল': '🫙', 'জিরা': '✨', 'হলুদ': '✨',
+  'দারুচিনি': '🪵', 'তেজপাতা': '🌿', 'লবঙ্গ': '🌰',
+  'কিশমিশ': '🍇', 'মশলা': '🌶️',
+  // ডেইরি
+  'দুধ': '🥛', 'দই': '🥛', 'মিল্ক': '🥛',
+  // অন্যান্য
+  'ডিম': '🥚', 'চিনি': '🍬', 'লবণ': '🧂',
+  'চা': '🍵', 'সেমাই': '🍜',
+  'সাবান': '🧼', 'টিস্যু': '🧻', 'ন্যাপকিন': '🧻',
+  'ডিটারজেন্ট': '🧴', 'ওয়াশিং': '🧴',
+};
+
+function getProdIcon(name) {
+  // Try exact match first
+  for (const [key, icon] of Object.entries(PROD_ICONS)) {
+    if (name.includes(key)) return icon;
+  }
+  // Category fallback
+  return '📦';
+}
+
+function getCatIcon(cat) {
+  const map = {
+    'সবজি':    '🥬',
+    'ফল':      '🍌',
+    'ডাল/চাল': '🌾',
+    'মশলা':    '🌶️',
+    'ডেইরি':   '🥛',
+    'অন্যান্য': '📦',
+  };
+  return map[cat] || '📦';
 }
 
 /* ═══ PRICE GRID ════════════════════════════════ */
@@ -179,14 +235,16 @@ function renderGrid(data) {
     const cls  = chg < 0 ? 'up' : chg > 0 ? 'dn' : 'flat';
     const sign = chg > 0 ? '+' : '';
     const pct  = p.oldPrice ? Math.abs(Math.round(chg/p.oldPrice*100)) : 0;
+    const icon = getProdIcon(p.name);
     return `<div class="price-card" onclick="">
+      <div style="font-size:1.8rem;line-height:1;margin-bottom:6px">${icon}</div>
       <div class="pc-name">${p.name}</div>
-      <div class="pc-unit">${p.unit} · ${p.cat}</div>
+      <div class="pc-unit">${p.unit} · ${getCatIcon(p.cat)} ${p.cat}</div>
       <div class="pc-price">৳${p.price} <small>/ ${p.unit}</small></div>
       <div class="pc-chg ${cls}">${p.oldPrice ? sign+'৳'+Math.abs(chg).toFixed(0)+' ('+pct+'%)' : '— আজকের দাম'}</div>
       <div class="pc-actions">
-        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();goChart(${p.id})">📈</button>
-        <button class="btn btn-solid btn-sm" onclick="event.stopPropagation();goCreate(${p.id},'${p.name.replace(/'/g,"\\'")}',${p.price})">+ চুক্তি</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();goChart(${p.id})" title="দামের ইতিহাস">📈 চার্ট</button>
+        <button class="btn btn-solid btn-sm" onclick="event.stopPropagation();goCreate(${p.id},'${p.name.replace(/'/g,"\\'")}',${p.price})" title="কন্ট্র্যাক্ট তৈরি">+ চুক্তি</button>
       </div>
     </div>`;
   }).join('');
@@ -226,17 +284,27 @@ function renderMovers(prods) {
   const movers  = prods.filter(p => p.oldPrice).slice(0, 6);
   const display = movers.length ? movers : prods.slice(0, 6);
   el.innerHTML = display.map(p => {
-    const chg = p.oldPrice ? p.price - p.oldPrice : 0;
-    const pct = p.oldPrice ? Math.round(chg/p.oldPrice*100) : 0;
-    const cls = chg < 0 ? 'dn' : chg > 0 ? 'up' : 'flat';
+    const chg  = p.oldPrice ? p.price - p.oldPrice : 0;
+    const pct  = p.oldPrice ? Math.round(chg/p.oldPrice*100) : 0;
+    const cls  = chg < 0 ? 'dn' : chg > 0 ? 'up' : 'flat';
+    const icon = getProdIcon(p.name);
     return `<div class="price-card">
+      <div style="font-size:1.8rem;line-height:1;margin-bottom:6px">${icon}</div>
       <div class="pc-name">${p.name}</div>
       <div class="pc-unit">${p.unit}</div>
       <div class="pc-price">৳${p.price}</div>
-      <div class="pc-chg ${cls}">${chg!==0?(chg>0?'↑':'↓')+'৳'+Math.abs(chg)+' ('+pct+'%)':'— স্থির'}</div>
+      <div class="pc-chg ${cls}">${chg!==0?(chg>0?'↑':'↓')+' ৳'+Math.abs(chg)+' ('+pct+'%)':'— আজকের রেট'}</div>
     </div>`;
   }).join('');
 }
+
+/* ═══ LOGOUT ════════════════════════════════════ */
+window.doLogout = function() {
+  Auth.clear();
+  updateNav();
+  showPage('home');
+  showToast('✅ সফলভাবে লগআউট হয়েছেন', 'success');
+};
 
 /* ═══ CONTRACTS ═════════════════════════════════ */
 function renderContracts(list) {
@@ -769,10 +837,246 @@ window.rejectTxn = async function(id) {
   if (r) { showToast('❌ বাতিল করা হয়েছে','error'); loadAdmin(); }
 };
 
+/* ════════════════════════════════════════════════════
+   PRICE FETCH → PREVIEW → SAVE  (3-step flow)
+════════════════════════════════════════════════════ */
+
+let _previewData   = [];   // full preview items from API
+let _previewFilter = 'all';
+
+/* ── helpers ── */
+function showPriceStep(step) {
+  ['priceStep1','priceStep2','priceStep3','priceManual'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const target = step === 1 ? 'priceStep1'
+               : step === 2 ? 'priceStep2'
+               : step === 3 ? 'priceStep3'
+               : 'priceManual';
+  const el = document.getElementById(target);
+  if (el) el.style.display = '';
+
+  // Step indicator colours
+  ['ps1','ps2','ps3'].forEach((id, i) => {
+    const s = document.getElementById(id);
+    if (!s) return;
+    const active = (i + 1) <= (step === 'manual' ? 1 : step);
+    s.style.color      = active ? 'var(--primary)'  : 'var(--text-dim)';
+    s.style.background = active ? 'var(--primary-glow)' : 'transparent';
+    const dot = s.querySelector('span');
+    if (dot) {
+      dot.style.background = active ? 'var(--primary)'  : 'var(--bg4)';
+      dot.style.color      = active ? '#1a1208' : 'var(--text-dim)';
+    }
+  });
+}
+
+window.backToStep1 = function() { showPriceStep(1); };
+
+window.loadAdminManualPrices = async function() {
+  showPriceStep('manual');
+  const prods = await A.productsRaw();
+  if (prods) renderAdminPrices(prods);
+};
+
+/* ── STEP 1 → FETCH ── */
+window.startFetchPreview = async function() {
+  const btn = document.getElementById('fetchBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Fetch হচ্ছে...'; }
+
+  showToast('⏳ Chaldal থেকে দাম আনছে... একটু অপেক্ষা করুন', 'info');
+
+  const data = await A.fetchPreview();
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Chaldal থেকে দাম আনুন'; }
+
+  if (!data) {
+    showToast('❌ Fetch ব্যর্থ হয়েছে। আবার চেষ্টা করুন।', 'error');
+    return;
+  }
+
+  _previewData   = data.items || [];
+  _previewFilter = 'all';
+
+  // Summary bar
+  const sumEl = document.getElementById('fetchSummary');
+  if (sumEl) {
+    sumEl.innerHTML = [
+      { label: `✅ সফল`, count: data.fetched,  cls: 'bg-green' },
+      { label: `🔄 পরিবর্তিত`, count: data.changed, cls: 'bg-amber' },
+      { label: `❌ ব্যর্থ`,    count: data.failed,  cls: 'bg-red'  },
+      { label: `🔗 URL নেই`,   count: data.no_url,  cls: 'bg-gray' },
+    ].map(s => `<div class="badge ${s.cls}" style="font-size:0.82rem;padding:6px 14px">
+      ${s.label}: <strong>${s.count}</strong>
+    </div>`).join('');
+  }
+
+  renderPreviewTable('all');
+  showPriceStep(2);
+
+  if (data.changed > 0) {
+    showToast(`✅ ${data.fetched}টি পণ্য fetch হয়েছে। ${data.changed}টি দাম পরিবর্তিত।`, 'success');
+  } else {
+    showToast(`ℹ️ ${data.fetched}টি পণ্য fetch হয়েছে। কোনো দাম পরিবর্তিত হয়নি।`, 'info');
+  }
+};
+
+/* ── STEP 2 → RENDER TABLE ── */
+function renderPreviewTable(filter) {
+  _previewFilter = filter;
+  const tbody = document.getElementById('pricePreviewTable');
+  if (!tbody) return;
+
+  let items = _previewData;
+  if (filter === 'changed') items = items.filter(i => i.changed);
+  if (filter === 'failed')  items = items.filter(i => i.fetch_status === 'failed');
+  if (filter === 'no_url')  items = items.filter(i => i.fetch_status === 'no_url');
+
+  const countEl = document.getElementById('previewCount');
+  if (countEl) countEl.textContent = `${items.length}টি পণ্য`;
+
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">কোনো পণ্য নেই</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(item => {
+    const fetchedPrice = item.fetched_price;
+    const editVal      = fetchedPrice ?? item.old_price;
+    const diff         = fetchedPrice ? fetchedPrice - item.old_price : 0;
+    const pct          = item.old_price ? Math.round(diff / item.old_price * 100) : 0;
+    const diffCls      = diff < 0 ? 'text-green' : diff > 0 ? 'text-red' : 'text-dim';
+    const diffTxt      = diff !== 0 ? `${diff>0?'+':''}৳${diff.toFixed(0)} (${pct}%)` : '—';
+
+    const statusBadge =
+      item.fetch_status === 'ok'        ? '<span class="badge bg-amber">পরিবর্তিত</span>' :
+      item.fetch_status === 'unchanged' ? '<span class="badge bg-gray">অপরিবর্তিত</span>' :
+      item.fetch_status === 'failed'    ? `<span class="badge bg-red" title="${item.chaldal_url||''}">ব্যর্থ</span>` :
+      '<span class="badge bg-gray">URL নেই</span>';
+
+    // Only pre-check rows that have a fetched price
+    const checked = fetchedPrice ? 'checked' : '';
+
+    return `<tr id="prow-${item.product_id}" class="${item.changed?'':'opacity-60'}" style="${!item.changed?'opacity:0.6':''}">
+      <td><input type="checkbox" ${checked} data-pid="${item.product_id}" class="prev-chk" style="accent-color:var(--primary)"></td>
+      <td>
+        <div style="font-weight:600;font-size:0.86rem">${item.name_bn}</div>
+        ${item.chaldal_url
+          ? `<a href="${item.chaldal_url}" target="_blank" style="font-size:0.7rem;color:var(--text-dim);font-family:var(--font-mono)">Chaldal ↗</a>`
+          : `<span style="font-size:0.7rem;color:var(--text-dim)">URL নেই</span>`}
+      </td>
+      <td class="mono" style="font-size:0.8rem">${item.unit}</td>
+      <td class="mono">৳${item.old_price}</td>
+      <td class="mono" style="font-weight:700;color:${fetchedPrice?'var(--text)':'var(--text-dim)'}">
+        ${fetchedPrice ? '৳'+fetchedPrice : '—'}
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input
+            class="price-edit-input prev-edit"
+            type="number"
+            value="${editVal}"
+            step="0.5" min="0"
+            data-pid="${item.product_id}"
+            data-old="${item.old_price}"
+            id="pi-${item.product_id}"
+            oninput="onPreviewInputChange(this)"
+            style="width:90px"
+          >
+          <button class="btn btn-xs btn-ghost" onclick="resetPreviewRow(${item.product_id},${item.old_price})" title="মূল দামে ফিরুন">↺</button>
+        </div>
+      </td>
+      <td class="mono ${diffCls}" style="font-size:0.82rem">${diffTxt}</td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+window.filterPreview = function(filter, btn) {
+  document.querySelectorAll('#priceStep2 .btn-xs').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = '';
+    b.style.color = '';
+  });
+  if (btn) {
+    btn.classList.add('active');
+    btn.style.background = 'var(--primary)';
+    btn.style.color = '#1a1208';
+  }
+  renderPreviewTable(filter);
+};
+
+window.toggleAllChecks = function(masterChk) {
+  document.querySelectorAll('.prev-chk').forEach(c => c.checked = masterChk.checked);
+};
+
+window.onPreviewInputChange = function(inp) {
+  const pid     = inp.dataset.pid;
+  const oldVal  = parseFloat(inp.dataset.old);
+  const newVal  = parseFloat(inp.value) || 0;
+  const diff    = newVal - oldVal;
+  // Update the diff cell in the same row
+  const row = document.getElementById('prow-' + pid);
+  if (!row) return;
+  const diffCell = row.cells[6];
+  if (!diffCell) return;
+  const pct  = oldVal ? Math.round(diff/oldVal*100) : 0;
+  diffCell.textContent = diff !== 0 ? `${diff>0?'+':''}৳${diff.toFixed(0)} (${pct}%)` : '—';
+  diffCell.className   = 'mono ' + (diff < 0 ? 'text-green' : diff > 0 ? 'text-red' : 'text-dim');
+  diffCell.style.fontSize = '0.82rem';
+};
+
+window.resetPreviewRow = function(pid, oldPrice) {
+  const inp = document.getElementById('pi-' + pid);
+  if (inp) { inp.value = oldPrice; onPreviewInputChange(inp); }
+};
+
+/* ── STEP 3 → SAVE ── */
+window.savePreviewedPrices = async function() {
+  const checkedInputs = document.querySelectorAll('.prev-chk:checked');
+  if (!checkedInputs.length) { showToast('কমপক্ষে একটি পণ্য বেছে নিন', 'error'); return; }
+
+  const updates = [];
+  checkedInputs.forEach(chk => {
+    const pid   = parseInt(chk.dataset.pid);
+    const inp   = document.getElementById('pi-' + pid);
+    const price = inp ? parseFloat(inp.value) : 0;
+    const oldEl = inp ? parseFloat(inp.dataset.old) : 0;
+    if (pid && price > 0) updates.push({ product_id: pid, new_price: price });
+  });
+
+  if (!updates.length) { showToast('কোনো পরিবর্তন নেই', 'error'); return; }
+
+  const saveBtn = document.getElementById('saveAllBtn');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ সেভ হচ্ছে...'; }
+
+  const r = await A.bulkPrice(updates);
+
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '💾 পরিবর্তিত দাম সেভ করুন'; }
+
+  if (r) {
+    // Update local cache
+    updates.forEach(u => { if (_prodMap[u.product_id]) _prodMap[u.product_id].price = u.new_price; });
+
+    // Show step 3
+    const sumEl = document.getElementById('savedSummary');
+    if (sumEl) sumEl.textContent = `${r.updated}টি পণ্যের দাম সফলভাবে আপডেট হয়েছে।`;
+    const timeEl = document.getElementById('savedTime');
+    if (timeEl) timeEl.textContent = new Date().toLocaleString('bn-BD');
+
+    showPriceStep(3);
+    showToast(`✅ ${r.updated}টি পণ্যের দাম সেভ হয়েছে!`, 'success');
+
+    // Reload admin data in background
+    setTimeout(loadAdmin, 1000);
+  }
+};
+
 window.triggerScrape = async function() {
-  showToast('⏳ Chaldal থেকে দাম আনছে...','info');
+  showToast('⏳ Background scrape শুরু হয়েছে...', 'info');
   const r = await A.scrape();
-  if (r) { showToast('✅ '+r.message,'success'); setTimeout(loadAdmin, 2000); }
+  if (r) showToast('✅ ' + r.message, 'success');
 };
 window.triggerSettlement = async function() {
   showToast('⏳ Settlement শুরু হচ্ছে...','info');

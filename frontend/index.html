@@ -1,2858 +1,1557 @@
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>BazarFutures — ভবিষ্যতের বাজার</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Space+Mono:wght@400;700&display=swap"
-    rel="stylesheet">
-  <style>
-    /* ════════════════════════════════════════════════
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BazarFutures — ভবিষ্যতের বাজার</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════
    DESIGN: Warm saffron-earth tones — বাজারের রং
    Primary: deep amber/turmeric + cream + charcoal
 ════════════════════════════════════════════════ */
-    :root {
-      /* --bg: #1a1208;
-      --bg2: #231a0a;
-      --bg3: #2e2010; */
-      --bg: #0a0f0d;
-      --bg2: #0f1a14;
-      --bg3: #162110;
-      --bg4: #3a2814;
-      --primary: #22c55e;
-      /* turmeric amber */
-      --primary-d: #22c55e;
-      --primary-glow: rgba(245, 158, 11, 0.15);
-      --primary-pale: #fef3c7;
-      --green: #4ade80;
-      /* profit green */
-      --green-glow: rgba(74, 222, 128, 0.12);
-      --red: #f87171;
-      /* loss red */
-      --red-glow: rgba(248, 113, 113, 0.12);
-      --cream: #ffffff;
-      --text: #ffffff;
-      --text-mid: #4ade80;
-      --text-dim: #9da18f;
-      --border: rgba(245, 158, 11, 0.18);
-      --border-b: rgba(245, 158, 11, 0.4);
-      /* --card: rgba(247, 168, 32, 0.85); */
-      --card: rgba(15, 26, 20, 0.8);
-      --radius: 14px;
-      --radius-sm: 8px;
-      --font-bn: 'Hind Siliguri', sans-serif;
-      --font-dis: 'Tiro Bangla', serif;
-      --font-mono: 'Space Mono', monospace;
-      --nav-h: 60px;
-      --tick-h: 34px;
-      --top: calc(var(--nav-h) + var(--tick-h));
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    /* ─── RESET ─── */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      font-size: 16px;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-bn);
-      min-height: 100vh;
-      overflow-x: hidden;
-      line-height: 1.5;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: radial-gradient(ellipse at 20% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 100%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
-    }
-
-    img {
-      max-width: 100%;
-    }
-
-    a {
-      text-decoration: none;
-    }
-
-    button {
-      cursor: pointer;
-      font-family: var(--font-bn);
-    }
-
-    /* ─── SCROLLBAR ─── */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg2);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 3px;
-    }
-
-    /* ════════ NAVBAR ════════ */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
-      height: var(--nav-h);
-      background: rgba(26, 18, 8, 0.96);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      gap: 12px;
-    }
-
-    .nav-logo {
-      font-family: var(--font-dis);
-      font-size: 1.25rem;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .nav-logo small {
-      color: var(--text-dim);
-      font-size: 0.72rem;
-      font-family: var(--font-bn);
-      font-weight: 300;
-      display: none;
-    }
-
-    @media(min-width:600px) {
-      .nav-logo small {
-        display: inline;
-      }
-    }
-
-    /* Desktop links */
-    .nav-links {
-      display: none;
-      align-items: center;
-      gap: 2px;
-    }
-
-    @media(min-width:900px) {
-      .nav-links {
-        display: flex;
-      }
-    }
-
-    .nav-links a {
-      color: var(--text-dim);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 500;
-      transition: all 0.18s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: var(--primary);
-      background: var(--primary-glow);
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    /* ─── BUTTONS ─── */
-    .btn {
-      padding: 8px 18px;
-      border-radius: 9px;
-      font-size: 0.86rem;
-      font-family: var(--font-bn);
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.18s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      white-space: nowrap;
-      user-select: none;
-    }
-
-    .btn-solid {
-      background: var(--primary);
-      color: #1a1208;
-      font-weight: 700;
-    }
-
-    .btn-solid:hover {
-      background: var(--primary-pale);
-      transform: translateY(-1px);
-    }
-
-    .btn-solid:active {
-      transform: translateY(0);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--primary);
-      border: 1px solid var(--border-b);
-    }
-
-    .btn-outline:hover {
-      background: var(--primary-glow);
-    }
-
-    .btn-outline:active {
-      background: var(--primary-glow);
-    }
-
-    .btn-ghost {
-      background: var(--bg3);
-      color: var(--text-mid);
-      border: 1px solid var(--border);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--border-b);
-      color: var(--primary);
-    }
-
-    .btn-danger {
-      background: var(--red);
-      color: #fff;
-    }
-
-    .btn-green {
-      background: var(--green);
-      color: #0a1a0a;
-      font-weight: 700;
-    }
-
-    .btn-sm {
-      padding: 6px 14px;
-      font-size: 0.80rem;
-      border-radius: 7px;
-    }
-
-    .btn-xs {
-      padding: 4px 10px;
-      font-size: 0.75rem;
-      border-radius: 6px;
-    }
-
-    .btn-full {
-      width: 100%;
-    }
-
-    /* ─── MOBILE BOTTOM NAV ─── */
-    .mobile-nav {
-      display: flex;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
-      background: rgba(26, 18, 8, 0.98);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      height: 60px;
-    }
-
-    @media(min-width:900px) {
-      .mobile-nav {
-        display: none;
-      }
-    }
-
-    .mnav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 6px 4px;
-      color: var(--text-dim);
-      font-size: 0.68rem;
-      cursor: pointer;
-      transition: color 0.18s;
-      border: none;
-      background: none;
-      font-family: var(--font-bn);
-    }
-
-    .mnav-item.active,
-    .mnav-item:hover {
-      color: var(--primary);
-    }
-
-    .mnav-item .mni {
-      font-size: 1.25rem;
-      line-height: 1;
-    }
-
-    /* ════════ TICKER ════════ */
-    .ticker-bar {
-      position: fixed;
-      top: var(--nav-h);
-      left: 0;
-      right: 0;
-      z-index: 199;
-      height: var(--tick-h);
-      overflow: hidden;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-    }
-
-    .ticker-label {
-      background: var(--primary);
-      color: #1a1208;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      padding: 0 12px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .ticker-wrap {
-      overflow: hidden;
-      flex: 1;
-    }
-
-    .ticker-track {
-      display: flex;
-      animation: scroll-ticker 45s linear infinite;
-      white-space: nowrap;
-    }
-
-    .ticker-track:hover {
-      animation-play-state: paused;
-    }
-
-    @keyframes scroll-ticker {
-      0% {
-        transform: translateX(0)
-      }
-
-      100% {
-        transform: translateX(-50%)
-      }
-    }
-
-    .tick-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 18px;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      color: var(--text-mid);
-      border-right: 1px solid var(--border);
-    }
-
-    .tick-item .tp {
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    .tick-item .up {
-      color: var(--green);
-    }
-
-    .tick-item .dn {
-      color: var(--red);
-    }
-
-    /* ════════ MAIN LAYOUT ════════ */
-    main {
-      padding-top: var(--top);
-      padding-bottom: 70px;
-      /* mobile nav space */
-      min-height: 100vh;
-    }
-
-    @media(min-width:900px) {
-      main {
-        padding-bottom: 0;
-      }
-    }
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    @media(min-width:600px) {
-      .container {
-        padding: 0 24px;
-      }
-    }
-
-    /* ─── SECTION HEADER ─── */
-    .sec-head {
-      margin-bottom: 20px;
-    }
-
-    .sec-head h2 {
-      font-family: var(--font-dis);
-      font-size: 1.5rem;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    @media(min-width:600px) {
-      .sec-head h2 {
-        font-size: 1.8rem;
-      }
-    }
-
-    .sec-head p {
-      color: var(--text-dim);
-      font-size: 0.86rem;
-    }
-
-    /* ════════ HOME / HERO ════════ */
-    .hero {
-      min-height: calc(100vh - var(--top) - 60px);
-      display: flex;
-      align-items: center;
-      padding: 40px 0 20px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--primary-glow);
-      border: 1px solid var(--border-b);
-      border-radius: 100px;
-      padding: 5px 14px;
-      font-size: 0.78rem;
-      color: var(--primary);
-      margin-bottom: 20px;
-      font-family: var(--font-mono);
-    }
-
-    .hero-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--primary);
-      animation: blink 2s infinite;
-    }
-
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1)
-      }
-
-      50% {
-        opacity: .4;
-        transform: scale(1.3)
-      }
-    }
-
-    .hero h1 {
-      font-family: var(--font-dis);
-      font-size: clamp(1.8rem, 6vw, 3.2rem);
-      line-height: 1.2;
-      margin-bottom: 16px;
-    }
-
-    .hero h1 em {
-      color: var(--primary);
-      font-style: normal;
-    }
-
-    .hero p {
-      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
-      color: var(--text-mid);
-      line-height: 1.7;
-      margin-bottom: 28px;
-      max-width: 520px;
-    }
-
-    .hero-btns {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .hero-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 40px;
-    }
-
-    .hstat {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 14px;
-      backdrop-filter: blur(10px);
-    }
-
-    .hstat .num {
-      font-family: var(--font-mono);
-      font-size: 1.4rem;
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    .hstat .lbl {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      margin-top: 3px;
-    }
-
-    /* HOW IT WORKS */
-    .how-sec {
-      padding: 50px 0;
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    @media(min-width:700px) {
-      .steps {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .step-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 16px;
-    }
-
-    .step-n {
-      font-family: var(--font-mono);
-      font-size: 2rem;
-      color: rgba(245, 158, 11, 0.2);
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-
-    .step-card h4 {
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
-
-    .step-card p {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    /* TOP MOVERS */
-    .movers-sec {
-      padding: 40px 0;
-    }
-
-    /* ════════ PRICE GRID ════════ */
-    .prices-sec {
-      padding: 24px 0;
-    }
-
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-
-    .filter-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .filter-btn {
-      padding: 7px 14px;
-      border-radius: 100px;
-      white-space: nowrap;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      font-family: var(--font-bn);
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: all 0.18s;
-      flex-shrink: 0;
-    }
-
-    .filter-btn.active,
-    .filter-btn:hover {
-      background: var(--primary-glow);
-      border-color: var(--border-b);
-      color: var(--primary);
-    }
-
-    .search-row {
-      display: flex;
-      align-items: center;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 9px 14px;
-      margin-bottom: 20px;
-      gap: 8px;
-    }
-
-    .search-row input {
-      flex: 1;
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: var(--font-bn);
-      font-size: 0.9rem;
-    }
-
-    .search-row input::placeholder {
-      color: var(--text-dim);
-    }
-
-    .price-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    @media(min-width:480px) {
-      .price-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-      }
-    }
-
-    @media(min-width:700px) {
-      .price-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media(min-width:960px) {
-      .price-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media(min-width:1200px) {
-      .price-grid {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    .price-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 12px;
-      transition: all 0.2s;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .price-card:hover {
-      border-color: var(--border-b);
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1);
-    }
-
-    .price-card:active {
-      transform: scale(0.98);
-    }
-
-    .pc-name {
-      font-size: 0.82rem;
-      color: var(--text-mid);
-      font-weight: 500;
-      line-height: 1.3;
-    }
-
-    .pc-unit {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-    }
-
-    .pc-price {
-      font-size: 1.25rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      color: var(--text);
-      margin: 4px 0;
-    }
-
-    .pc-price small {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      font-weight: 400;
-    }
-
-    .pc-chg {
-      font-size: 0.72rem;
-      font-family: var(--font-mono);
-    }
-
-    .pc-chg.up {
-      color: var(--green);
-    }
-
-    .pc-chg.dn {
-      color: var(--red);
-    }
-
-    .pc-chg.flat {
-      color: var(--text-dim);
-    }
-
-    .pc-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .pc-actions .btn {
-      flex: 1;
-      font-size: 0.72rem;
-      padding: 6px 4px;
-    }
-
-    /* ════════ CONTRACTS ════════ */
-    .contracts-sec {
-      padding: 24px 0;
-    }
-
-    .contracts-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .ctab-row {
-      display: flex;
-      gap: 4px;
-      overflow-x: auto;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 4px;
-      scrollbar-width: none;
-    }
-
-    .ctab-row::-webkit-scrollbar {
-      display: none;
-    }
-
-    .ctab {
-      padding: 7px 16px;
-      border-radius: 7px;
-      font-family: var(--font-bn);
-      font-size: 0.84rem;
-      cursor: pointer;
-      transition: all 0.18s;
-      color: var(--text-dim);
-      background: none;
-      border: none;
-      white-space: nowrap;
-    }
-
-    .ctab.active {
-      background: var(--primary);
-      color: #1a1208;
-      font-weight: 700;
-    }
-
-    .ctab:hover:not(.active) {
-      color: var(--primary);
-    }
-
-    .contract-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .cc {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-
-    .cc:hover {
-      border-color: var(--border-b);
-    }
-
-    .cc-top {
-      padding: 16px 16px 0;
-    }
-
-    .cc-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .cc-prod {
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    .cc-meta {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    .cc-badges {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-size: 0.72rem;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .bg-amber {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--primary);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .bg-green {
-      background: var(--green-glow);
-      color: var(--green);
-      border: 1px solid rgba(74, 222, 128, 0.3);
-    }
-
-    .bg-red {
-      background: var(--red-glow);
-      color: var(--red);
-      border: 1px solid rgba(248, 113, 113, 0.3);
-    }
-
-    .bg-gray {
-      background: rgba(124, 96, 64, 0.15);
-      color: var(--text-dim);
-      border: 1px solid rgba(124, 96, 64, 0.3);
-    }
-
-    .cc-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    @media(min-width:600px) {
-      .cc-grid {
-        grid-template-columns: repeat(6, 1fr);
-      }
-    }
-
-    .cc-stat label {
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .cc-stat .v {
-      font-family: var(--font-mono);
-      font-size: 0.88rem;
-      font-weight: 700;
-    }
-
-    .cc-foot {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.15);
-    }
-
-    /* ════════ HISTORY / CHART ════════ */
-    .history-sec {
-      padding: 24px 0;
-    }
-
-    .chart-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-
-    .chart-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 16px 20px 0;
-    }
-
-    .chart-product-name {
-      font-weight: 600;
-      font-size: 1.05rem;
-    }
-
-    .chart-ranges {
-      display: flex;
-      gap: 4px;
-    }
-
-    .rng-btn {
-      padding: 5px 11px;
-      border-radius: 6px;
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      cursor: pointer;
-      transition: all 0.18s;
-    }
-
-    .rng-btn.active,
-    .rng-btn:hover {
-      background: var(--primary-glow);
-      border-color: var(--border-b);
-      color: var(--primary);
-    }
-
-    .chart-area {
-      padding: 16px 20px;
-    }
-
-    .chart-canvas-wrap {
-      position: relative;
-      height: 220px;
-    }
-
-    @media(min-width:600px) {
-      .chart-canvas-wrap {
-        height: 280px;
-      }
-    }
-
-    canvas#priceChart {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    .chart-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    @media(min-width:600px) {
-      .chart-stats {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    .cs-item {
-      text-align: center;
-    }
-
-    .cs-item .cv {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-
-    .cs-item .cl {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    /* product select */
-    .chart-sel-row {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .chart-sel-row label {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      flex-shrink: 0;
-    }
-
-    .chart-sel-row select {
-      flex: 1;
-      min-width: 0;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 12px;
-      color: var(--text);
-      font-family: var(--font-bn);
-      font-size: 0.88rem;
-      outline: none;
-    }
-
-    /* ════════ DASHBOARD ════════ */
-    .dash-sec {
-      padding: 24px 0;
-    }
-
-    .dash-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    @media(min-width:900px) {
-      .dash-layout {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 24px;
-      }
-    }
-
-    .dash-side {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-    }
-
-    @media(min-width:900px) {
-      .dash-side {
-        width: 260px;
-        flex-shrink: 0;
-        position: sticky;
-        top: calc(var(--top) + 16px);
-      }
-    }
-
-    .dash-av {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--primary-glow);
-      border: 2px solid var(--border-b);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      margin-bottom: 12px;
-    }
-
-    .dash-name {
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    .dash-email {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    .bal-box {
-      margin-top: 16px;
-      padding: 14px;
-      background: var(--bg3);
-      border-radius: 10px;
-      border: 1px solid var(--border);
-    }
-
-    .bal-box label {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .bal-box .amount {
-      font-family: var(--font-mono);
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-top: 4px;
-    }
-
-    .bal-box .frozen {
-      font-size: 0.75rem;
-      color: var(--red);
-      margin-top: 3px;
-      font-family: var(--font-mono);
-    }
-
-    .dash-menu {
-      margin-top: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .dmenu-item {
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 0.86rem;
-      cursor: pointer;
-      transition: all 0.18s;
-      color: var(--text-mid);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: none;
-      background: none;
-      font-family: var(--font-bn);
-      width: 100%;
-      text-align: left;
-    }
-
-    .dmenu-item.active,
-    .dmenu-item:hover {
-      background: var(--primary-glow);
-      color: var(--primary);
-    }
-
-    .dash-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .dash-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-    }
-
-    .dash-card h4 {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding-bottom: 12px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .wal-actions {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .wal-actions .btn {
-      flex: 1;
-    }
-
-    .txn-list {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .txn-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.86rem;
-      gap: 10px;
-    }
-
-    .txn-item:last-child {
-      border-bottom: none;
-    }
-
-    .txn-type {
-      color: var(--text-mid);
-    }
-
-    .txn-date {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-      margin-top: 2px;
-    }
-
-    .txn-amt {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .txn-amt.cr {
-      color: var(--green);
-    }
-
-    .txn-amt.dr {
-      color: var(--red);
-    }
-
-    /* ════════ ADMIN ════════ */
-    .admin-sec {
-      padding: 24px 0;
-    }
-
-    .admin-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    @media(min-width:600px) {
-      .admin-stats {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media(min-width:900px) {
-      .admin-stats {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    .astat {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 14px;
-    }
-
-    .astat .an {
-      font-family: var(--font-mono);
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
-    .astat .al {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      margin-top: 3px;
-    }
-
-    .admin-tabs {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .admin-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .atab {
-      padding: 8px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      font-family: var(--font-bn);
-      font-size: 0.84rem;
-      transition: all 0.18s;
-    }
-
-    .atab.active {
-      background: var(--primary);
-      color: #1a1208;
-      border-color: var(--primary);
-      font-weight: 700;
-    }
-
-    .atab:hover:not(.active) {
-      border-color: var(--border-b);
-      color: var(--text);
-    }
-
-    .table-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 500px;
-    }
-
-    thead th {
-      background: var(--bg3);
-      padding: 10px 14px;
-      text-align: left;
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    tbody td {
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.84rem;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    tbody tr:hover {
-      background: rgba(245, 158, 11, 0.03);
-    }
-
-    .price-edit-input {
-      width: 90px;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 5px 9px;
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.84rem;
-      outline: none;
-    }
-
-    .price-edit-input:focus {
-      border-color: var(--primary);
-    }
-
-    /* ════════ AUTH ════════ */
-    .auth-page {
-      min-height: calc(100vh - var(--top) - 60px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 30px 16px;
-    }
-
-    .auth-box {
-      background: var(--card);
-      border: 1px solid var(--border-b);
-      border-radius: 16px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    @media(min-width:500px) {
-      .auth-box {
-        padding: 36px 32px;
-      }
-    }
-
-    .auth-box h2 {
-      font-family: var(--font-dis);
-      font-size: 1.5rem;
-      margin-bottom: 6px;
-    }
-
-    .auth-box p {
-      color: var(--text-dim);
-      font-size: 0.88rem;
-      margin-bottom: 24px;
-    }
-
-    .auth-switch {
-      text-align: center;
-      margin-top: 18px;
-      font-size: 0.86rem;
-      color: var(--text-dim);
-    }
-
-    .auth-switch a {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    /* ════════ DOCS ════════ */
-    .docs-sec {
-      padding: 24px 0;
-    }
-
-    .docs-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    @media(min-width:900px) {
-      .docs-layout {
-        flex-direction: row;
-        align-items: flex-start;
-      }
-    }
-
-    .docs-nav {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-    }
-
-    @media(min-width:900px) {
-      .docs-nav {
-        width: 220px;
-        flex-shrink: 0;
-        position: sticky;
-        top: calc(var(--top)+16px);
-      }
-    }
-
-    .docs-nav h4 {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 10px;
-    }
-
-    .docs-nav-link {
-      display: block;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.84rem;
-      color: var(--text-mid);
-      margin-bottom: 2px;
-      transition: all 0.18s;
-    }
-
-    .docs-nav-link:hover {
-      color: var(--primary);
-      background: var(--primary-glow);
-    }
-
-    .docs-content {
-      flex: 1;
-    }
-
-    .docs-content h3 {
-      font-family: var(--font-dis);
-      font-size: 1.3rem;
-      color: var(--primary);
-      margin: 28px 0 12px;
-    }
-
-    .docs-content h3:first-child {
-      margin-top: 0;
-    }
-
-    .docs-content p {
-      line-height: 1.8;
-      color: var(--text-mid);
-      margin-bottom: 14px;
-      font-size: 0.92rem;
-    }
-
-    .docs-content ul {
-      padding-left: 18px;
-      color: var(--text-mid);
-      line-height: 1.9;
-      font-size: 0.92rem;
-      margin-bottom: 14px;
-    }
-
-    .docs-ex {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--primary);
-      border-radius: 10px;
-      padding: 16px;
-      margin: 12px 0;
-    }
-
-    .docs-ex .ext {
-      font-size: 0.72rem;
-      color: var(--primary);
-      font-family: var(--font-mono);
-      margin-bottom: 8px;
-    }
-
-    .info-box {
-      background: rgba(248, 113, 113, 0.08);
-      border: 1px solid rgba(248, 113, 113, 0.25);
-      border-radius: 10px;
-      padding: 14px;
-      margin: 14px 0;
-      font-size: 0.88rem;
-      color: var(--red);
-      line-height: 1.7;
-    }
-
-    /* ════════ MODALS ════════ */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 300;
-      background: rgba(10, 6, 2, 0.88);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 0;
-    }
-
-    @media(min-width:600px) {
-      .modal-overlay {
-        align-items: center;
-        padding: 20px;
-      }
-    }
-
-    .modal-overlay.open {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--bg2);
-      border: 1px solid var(--border-b);
-      width: 100%;
-      max-width: 520px;
-      border-radius: 20px 20px 0 0;
-      padding: 24px 20px 32px;
-      max-height: 92vh;
-      overflow-y: auto;
-      position: relative;
-      animation: slideUp 0.25s ease;
-    }
-
-    @media(min-width:600px) {
-      .modal {
-        border-radius: 16px;
-        border-radius: 16px;
-        animation: fadeIn 0.2s ease;
-      }
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(100%)
-      }
-
-      to {
-        transform: translateY(0)
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.97)
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1)
-      }
-    }
-
-    .modal-handle {
-      width: 40px;
-      height: 4px;
-      background: var(--bg4);
-      border-radius: 2px;
-      margin: 0 auto 16px;
-    }
-
-    @media(min-width:600px) {
-      .modal-handle {
-        display: none;
-      }
-    }
-
-    .modal h3 {
-      font-family: var(--font-dis);
-      font-size: 1.25rem;
-      margin-bottom: 20px;
-      color: var(--primary);
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: var(--bg3);
-      border: none;
-      color: var(--text-dim);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-close:hover {
-      color: var(--text);
-      background: var(--bg4);
-    }
-
-    /* Form elements */
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin-bottom: 7px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .form-input {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 10px 14px;
-      color: var(--text);
-      font-family: var(--font-bn);
-      font-size: 0.92rem;
-      outline: none;
-      transition: border-color 0.18s;
-      -webkit-appearance: none;
-    }
-
-    .form-input:focus {
-      border-color: var(--primary);
-    }
-
-    select.form-input {
-      cursor: pointer;
-      background-image: none;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .sec-calc {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 14px;
-      margin-top: 6px;
-    }
-
-    .sc-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.86rem;
-      padding: 4px 0;
-    }
-
-    .sc-row span:last-child {
-      font-family: var(--font-mono);
-    }
-
-    .sc-row.total {
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
-      padding-top: 10px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    /* Payment method buttons */
-    .pm-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    @media(min-width:400px) {
-      .pm-grid {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    .pm-btn {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 6px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.18s;
-      font-size: 0.76rem;
-      color: var(--text-mid);
-    }
-
-    .pm-btn:hover,
-    .pm-btn.sel {
-      border-color: var(--border-b);
-      color: var(--primary);
-      background: var(--primary-glow);
-    }
-
-    .pm-icon {
-      font-size: 1.2rem;
-      margin-bottom: 4px;
-    }
-
-    /* Bid list */
-    .bid-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .bid-item {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .bid-price {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .bid-time {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-    }
-
-    /* ════════ TOAST ════════ */
-    .toast-wrap {
-      position: fixed;
-      bottom: 75px;
-      right: 12px;
-      left: 12px;
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-    @media(min-width:900px) {
-      .toast-wrap {
-        bottom: 24px;
-        left: auto;
-      }
-    }
-
-    .toast {
-      background: var(--bg2);
-      border: 1px solid var(--border-b);
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 0.86rem;
-      max-width: 340px;
-      width: 100%;
-      pointer-events: all;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: var(--shadow);
-      animation: toastIn 0.3s ease;
-    }
-
-    @keyframes toastIn {
-      from {
-        transform: translateY(20px);
-        opacity: 0
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1
-      }
-    }
-
-    .toast.success {
-      border-left: 3px solid var(--green);
-    }
-
-    .toast.error {
-      border-left: 3px solid var(--red);
-    }
-
-    .toast.info {
-      border-left: 3px solid var(--primary);
-    }
-
-    /* ════════ SKELETON ════════ */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 4px;
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: 200%
-      }
-
-      100% {
-        background-position: -200%
-      }
-    }
-
-    /* ════════ UTILITIES ════════ */
-    .text-primary {
-      color: var(--primary);
-    }
-
-    .text-green {
-      color: var(--green);
-    }
-
-    .text-red {
-      color: var(--red);
-    }
-
-    .text-dim {
-      color: var(--text-dim);
-    }
-
-    .text-mid {
-      color: var(--text-mid);
-    }
-
-    .mono {
-      font-family: var(--font-mono);
-    }
-
-    .mt-8 {
-      margin-top: 8px;
-    }
-
-    .mt-16 {
-      margin-top: 16px;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 20px 0;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--text-dim);
-      font-size: 0.9rem;
-    }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 0;
-      margin-top: 40px;
-      display: none;
-    }
-
-    @media(min-width:900px) {
-      footer {
-        display: block;
-      }
-    }
-
-    .foot-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .foot-logo {
-      font-family: var(--font-dis);
-      color: var(--primary);
-    }
-
-    .foot-links {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .foot-links a {
-      color: var(--text-dim);
-      font-size: 0.82rem;
-    }
-
-    .foot-links a:hover {
-      color: var(--primary);
-    }
-
-    .foot-copy {
-      font-size: 0.76rem;
-      color: var(--text-dim);
-      margin-top: 12px;
-    }
-  </style>
+:root {
+  --bg:         #1a1208;
+  --bg2:        #231a0a;
+  --bg3:        #2e2010;
+  --bg4:        #3a2814;
+  --primary:    #f59e0b;       /* turmeric amber */
+  --primary-d:  #d97706;
+  --primary-glow: rgba(245,158,11,0.15);
+  --primary-pale: #fef3c7;
+  --green:      #4ade80;       /* profit green */
+  --green-glow: rgba(74,222,128,0.12);
+  --red:        #f87171;       /* loss red */
+  --red-glow:   rgba(248,113,113,0.12);
+  --cream:      #fef9ef;
+  --text:       #fef3c7;
+  --text-mid:   #d4a853;
+  --text-dim:   #7c6040;
+  --border:     rgba(245,158,11,0.18);
+  --border-b:   rgba(245,158,11,0.4);
+  --card:       rgba(35,26,10,0.85);
+  --radius:     14px;
+  --radius-sm:  8px;
+  --font-bn:    'Hind Siliguri', sans-serif;
+  --font-dis:   'Tiro Bangla', serif;
+  --font-mono:  'Space Mono', monospace;
+  --nav-h:      60px;
+  --tick-h:     34px;
+  --top:        calc(var(--nav-h) + var(--tick-h));
+  --shadow:     0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.5);
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-bn);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: radial-gradient(ellipse at 20% 0%, rgba(245,158,11,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 100%, rgba(245,158,11,0.04) 0%, transparent 50%);
+}
+img { max-width: 100%; }
+a { text-decoration: none; }
+button { cursor: pointer; font-family: var(--font-bn); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+/* ════════ NAVBAR ════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: var(--nav-h);
+  background: rgba(26,18,8,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  gap: 12px;
+}
+.nav-logo {
+  font-family: var(--font-dis);
+  font-size: 1.25rem;
+  color: var(--primary);
+  display: flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-logo small {
+  color: var(--text-dim); font-size: 0.72rem;
+  font-family: var(--font-bn); font-weight: 300;
+  display: none;
+}
+@media(min-width:600px){ .nav-logo small { display: inline; } }
+
+/* Desktop links */
+.nav-links {
+  display: none; align-items: center; gap: 2px;
+}
+@media(min-width:900px){ .nav-links { display: flex; } }
+.nav-links a {
+  color: var(--text-dim); padding: 6px 12px; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 500; transition: all 0.18s;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--primary-glow); }
+
+.nav-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  padding: 8px 18px; border-radius: 9px; font-size: 0.86rem;
+  font-family: var(--font-bn); font-weight: 600; cursor: pointer;
+  border: none; transition: all 0.18s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  white-space: nowrap; user-select: none;
+}
+.btn-solid  { background: var(--primary); color: #1a1208; font-weight: 700; }
+.btn-solid:hover  { background: var(--primary-pale); transform: translateY(-1px); }
+.btn-solid:active { transform: translateY(0); }
+.btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border-b); }
+.btn-outline:hover { background: var(--primary-glow); }
+.btn-outline:active { background: var(--primary-glow); }
+.btn-ghost  { background: var(--bg3); color: var(--text-mid); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--border-b); color: var(--primary); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-green  { background: var(--green); color: #0a1a0a; font-weight: 700; }
+.btn-sm  { padding: 6px 14px; font-size: 0.80rem; border-radius: 7px; }
+.btn-xs  { padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; }
+.btn-full { width: 100%; }
+
+/* ─── MOBILE BOTTOM NAV ─── */
+.mobile-nav {
+  display: flex;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(26,18,8,0.98);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  height: 60px;
+}
+@media(min-width:900px){ .mobile-nav { display: none; } }
+.mnav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; padding: 6px 4px;
+  color: var(--text-dim); font-size: 0.68rem;
+  cursor: pointer; transition: color 0.18s;
+  border: none; background: none; font-family: var(--font-bn);
+}
+.mnav-item.active, .mnav-item:hover { color: var(--primary); }
+.mnav-item .mni { font-size: 1.25rem; line-height: 1; }
+
+/* ════════ TICKER ════════ */
+.ticker-bar {
+  position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 199;
+  height: var(--tick-h); overflow: hidden;
+  background: var(--bg3); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+}
+.ticker-label {
+  background: var(--primary); color: #1a1208;
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 0.68rem; letter-spacing: 0.08em;
+  padding: 0 12px; height: 100%;
+  display: flex; align-items: center; flex-shrink: 0;
+}
+.ticker-wrap { overflow: hidden; flex: 1; }
+.ticker-track {
+  display: flex; animation: scroll-ticker 45s linear infinite;
+  white-space: nowrap;
+}
+.ticker-track:hover { animation-play-state: paused; }
+@keyframes scroll-ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.tick-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 18px; font-size: 0.75rem; font-family: var(--font-mono);
+  color: var(--text-mid); border-right: 1px solid var(--border);
+}
+.tick-item .tp { color: var(--text); font-weight: 700; }
+.tick-item .up { color: var(--green); }
+.tick-item .dn { color: var(--red); }
+
+/* ════════ MAIN LAYOUT ════════ */
+main {
+  padding-top: var(--top);
+  padding-bottom: 70px; /* mobile nav space */
+  min-height: 100vh;
+}
+@media(min-width:900px){ main { padding-bottom: 0; } }
+.page { display: none; }
+.page.active { display: block; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+@media(min-width:600px){ .container { padding: 0 24px; } }
+
+/* ─── SECTION HEADER ─── */
+.sec-head { margin-bottom: 20px; }
+.sec-head h2 {
+  font-family: var(--font-dis); font-size: 1.5rem;
+  color: var(--text); margin-bottom: 4px;
+}
+@media(min-width:600px){ .sec-head h2 { font-size: 1.8rem; } }
+.sec-head p { color: var(--text-dim); font-size: 0.86rem; }
+
+/* ════════ HOME / HERO ════════ */
+.hero {
+  min-height: calc(100vh - var(--top) - 60px);
+  display: flex; align-items: center;
+  padding: 40px 0 20px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--primary-glow); border: 1px solid var(--border-b);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 0.78rem; color: var(--primary);
+  margin-bottom: 20px; font-family: var(--font-mono);
+}
+.hero-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary); animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.3)} }
+.hero h1 {
+  font-family: var(--font-dis);
+  font-size: clamp(1.8rem, 6vw, 3.2rem);
+  line-height: 1.2; margin-bottom: 16px;
+}
+.hero h1 em { color: var(--primary); font-style: normal; }
+.hero p {
+  font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+  color: var(--text-mid); line-height: 1.7;
+  margin-bottom: 28px; max-width: 520px;
+}
+.hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-top: 40px;
+}
+.hstat {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 14px;
+  backdrop-filter: blur(10px);
+}
+.hstat .num {
+  font-family: var(--font-mono); font-size: 1.4rem;
+  color: var(--primary); font-weight: 700;
+}
+.hstat .lbl { font-size: 0.75rem; color: var(--text-dim); margin-top: 3px; }
+
+/* HOW IT WORKS */
+.how-sec { padding: 50px 0; background: var(--bg2); border-top: 1px solid var(--border); }
+.steps { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+@media(min-width:700px){ .steps { grid-template-columns: repeat(4,1fr); } }
+.step-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 16px;
+}
+.step-n {
+  font-family: var(--font-mono); font-size: 2rem;
+  color: rgba(245,158,11,0.2); font-weight: 700;
+  line-height: 1; margin-bottom: 12px;
+}
+.step-card h4 { font-size: 0.9rem; margin-bottom: 8px; }
+.step-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+
+/* TOP MOVERS */
+.movers-sec { padding: 40px 0; }
+
+/* ════════ PRICE GRID ════════ */
+.prices-sec { padding: 24px 0; }
+.filter-bar {
+  display: flex; gap: 8px; flex-wrap: nowrap;
+  overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-btn {
+  padding: 7px 14px; border-radius: 100px; white-space: nowrap;
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text-dim); font-family: var(--font-bn);
+  font-size: 0.82rem; cursor: pointer; transition: all 0.18s;
+  flex-shrink: 0;
+}
+.filter-btn.active, .filter-btn:hover {
+  background: var(--primary-glow); border-color: var(--border-b);
+  color: var(--primary);
+}
+.search-row {
+  display: flex; align-items: center;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px;
+  margin-bottom: 20px; gap: 8px;
+}
+.search-row input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text); font-family: var(--font-bn); font-size: 0.9rem;
+}
+.search-row input::placeholder { color: var(--text-dim); }
+
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media(min-width:480px){ .price-grid { grid-template-columns: repeat(2,1fr); gap: 12px; } }
+@media(min-width:700px){ .price-grid { grid-template-columns: repeat(3,1fr); } }
+@media(min-width:960px){ .price-grid { grid-template-columns: repeat(4,1fr); } }
+@media(min-width:1200px){ .price-grid { grid-template-columns: repeat(5,1fr); } }
+
+.price-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 12px;
+  transition: all 0.2s; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.price-card:hover { border-color: var(--border-b); box-shadow: 0 4px 20px rgba(245,158,11,0.1); }
+.price-card:active { transform: scale(0.98); }
+.pc-name { font-size: 0.82rem; color: var(--text-mid); font-weight: 500; line-height: 1.3; }
+.pc-unit { font-size: 0.7rem; color: var(--text-dim); font-family: var(--font-mono); }
+.pc-price {
+  font-size: 1.25rem; font-weight: 700;
+  font-family: var(--font-mono); color: var(--text);
+  margin: 4px 0;
+}
+.pc-price small { font-size: 0.7rem; color: var(--text-dim); font-weight: 400; }
+.pc-chg { font-size: 0.72rem; font-family: var(--font-mono); }
+.pc-chg.up { color: var(--green); }
+.pc-chg.dn { color: var(--red); }
+.pc-chg.flat { color: var(--text-dim); }
+.pc-actions {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.pc-actions .btn { flex: 1; font-size: 0.72rem; padding: 6px 4px; }
+
+/* ════════ CONTRACTS ════════ */
+.contracts-sec { padding: 24px 0; }
+.contracts-toolbar {
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 12px;
+  margin-bottom: 20px;
+}
+.ctab-row {
+  display: flex; gap: 4px; overflow-x: auto;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 4px;
+  scrollbar-width: none;
+}
+.ctab-row::-webkit-scrollbar { display: none; }
+.ctab {
+  padding: 7px 16px; border-radius: 7px;
+  font-family: var(--font-bn); font-size: 0.84rem;
+  cursor: pointer; transition: all 0.18s;
+  color: var(--text-dim); background: none; border: none;
+  white-space: nowrap;
+}
+.ctab.active { background: var(--primary); color: #1a1208; font-weight: 700; }
+.ctab:hover:not(.active) { color: var(--primary); }
+
+.contract-list { display: flex; flex-direction: column; gap: 12px; }
+.cc {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: border-color 0.2s;
+}
+.cc:hover { border-color: var(--border-b); }
+.cc-top { padding: 16px 16px 0; }
+.cc-head {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.cc-prod { font-weight: 600; font-size: 1rem; }
+.cc-meta { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+.cc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.badge {
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 0.72rem; font-family: var(--font-mono);
+  font-weight: 700; white-space: nowrap;
+}
+.bg-amber { background: rgba(245,158,11,0.15); color: var(--primary); border: 1px solid rgba(245,158,11,0.3); }
+.bg-green { background: var(--green-glow); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+.bg-red   { background: var(--red-glow); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+.bg-gray  { background: rgba(124,96,64,0.15); color: var(--text-dim); border: 1px solid rgba(124,96,64,0.3); }
+
+.cc-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 14px;
+}
+@media(min-width:600px){ .cc-grid { grid-template-columns: repeat(6,1fr); } }
+.cc-stat label {
+  font-size: 0.68rem; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  display: block; margin-bottom: 3px;
+}
+.cc-stat .v {
+  font-family: var(--font-mono); font-size: 0.88rem;
+  font-weight: 700;
+}
+.cc-foot {
+  display: flex; gap: 8px; align-items: center;
+  flex-wrap: wrap; padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+}
+
+/* ════════ HISTORY / CHART ════════ */
+.history-sec { padding: 24px 0; }
+.chart-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.chart-head {
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 12px;
+  padding: 16px 20px 0;
+}
+.chart-product-name { font-weight: 600; font-size: 1.05rem; }
+.chart-ranges { display: flex; gap: 4px; }
+.rng-btn {
+  padding: 5px 11px; border-radius: 6px;
+  background: none; border: 1px solid var(--border);
+  color: var(--text-dim); font-family: var(--font-mono);
+  font-size: 0.74rem; cursor: pointer; transition: all 0.18s;
+}
+.rng-btn.active, .rng-btn:hover {
+  background: var(--primary-glow); border-color: var(--border-b);
+  color: var(--primary);
+}
+.chart-area { padding: 16px 20px; }
+.chart-canvas-wrap { position: relative; height: 220px; }
+@media(min-width:600px){ .chart-canvas-wrap { height: 280px; } }
+canvas#priceChart { width: 100% !important; height: 100% !important; }
+.chart-stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 12px; margin-top: 16px;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}
+@media(min-width:600px){ .chart-stats { grid-template-columns: repeat(5,1fr); } }
+.cs-item { text-align: center; }
+.cs-item .cv { font-family: var(--font-mono); font-weight: 700; font-size: 0.9rem; }
+.cs-item .cl { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+
+/* product select */
+.chart-sel-row {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+.chart-sel-row label { font-size: 0.82rem; color: var(--text-dim); flex-shrink: 0; }
+.chart-sel-row select {
+  flex: 1; min-width: 0; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 12px; color: var(--text);
+  font-family: var(--font-bn); font-size: 0.88rem; outline: none;
+}
+
+/* ════════ DASHBOARD ════════ */
+.dash-sec { padding: 24px 0; }
+.dash-layout {
+  display: flex; flex-direction: column; gap: 16px;
+}
+@media(min-width:900px){
+  .dash-layout { flex-direction: row; align-items: flex-start; gap: 24px; }
+}
+.dash-side {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+}
+@media(min-width:900px){
+  .dash-side { width: 260px; flex-shrink: 0; position: sticky; top: calc(var(--top) + 16px); }
+}
+.dash-av {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--primary-glow); border: 2px solid var(--border-b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 12px;
+}
+.dash-name { font-weight: 600; font-size: 1rem; }
+.dash-email { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
+.bal-box {
+  margin-top: 16px; padding: 14px;
+  background: var(--bg3); border-radius: 10px; border: 1px solid var(--border);
+}
+.bal-box label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.bal-box .amount {
+  font-family: var(--font-mono); font-size: 1.5rem;
+  font-weight: 700; color: var(--primary); margin-top: 4px;
+}
+.bal-box .frozen { font-size: 0.75rem; color: var(--red); margin-top: 3px; font-family: var(--font-mono); }
+.dash-menu { margin-top: 16px; display: flex; flex-direction: column; gap: 3px; }
+.dmenu-item {
+  padding: 9px 12px; border-radius: 8px; font-size: 0.86rem;
+  cursor: pointer; transition: all 0.18s; color: var(--text-mid);
+  display: flex; align-items: center; gap: 8px;
+  border: none; background: none; font-family: var(--font-bn); width: 100%; text-align: left;
+}
+.dmenu-item.active, .dmenu-item:hover {
+  background: var(--primary-glow); color: var(--primary);
+}
+.dash-main { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+.dash-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+}
+.dash-card h4 {
+  font-size: 0.82rem; font-weight: 600; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding-bottom: 12px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.wal-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+.wal-actions .btn { flex: 1; }
+.txn-list { display: flex; flex-direction: column; }
+.txn-item {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 10px 0;
+  border-bottom: 1px solid var(--border); font-size: 0.86rem;
+  gap: 10px;
+}
+.txn-item:last-child { border-bottom: none; }
+.txn-type { color: var(--text-mid); }
+.txn-date { font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px; }
+.txn-amt { font-family: var(--font-mono); font-weight: 700; white-space: nowrap; }
+.txn-amt.cr { color: var(--green); }
+.txn-amt.dr { color: var(--red); }
+
+/* ════════ ADMIN ════════ */
+.admin-sec { padding: 24px 0; }
+.admin-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 24px; }
+@media(min-width:600px){ .admin-stats { grid-template-columns: repeat(3,1fr); } }
+@media(min-width:900px){ .admin-stats { grid-template-columns: repeat(5,1fr); } }
+.astat {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 14px;
+}
+.astat .an { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; }
+.astat .al { font-size: 0.75rem; color: var(--text-dim); margin-top: 3px; }
+.admin-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; }
+.admin-tabs::-webkit-scrollbar { display: none; }
+.atab {
+  padding: 8px 18px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+  background: var(--bg2); border: 1px solid var(--border);
+  color: var(--text-dim); font-family: var(--font-bn); font-size: 0.84rem;
+  transition: all 0.18s;
+}
+.atab.active { background: var(--primary); color: #1a1208; border-color: var(--primary); font-weight: 700; }
+.atab:hover:not(.active) { border-color: var(--border-b); color: var(--text); }
+.table-wrap {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: auto;
+}
+table { width: 100%; border-collapse: collapse; min-width: 500px; }
+thead th {
+  background: var(--bg3); padding: 10px 14px; text-align: left;
+  font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 0.05em; border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(245,158,11,0.03); }
+.price-edit-input {
+  width: 90px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 9px; color: var(--text);
+  font-family: var(--font-mono); font-size: 0.84rem; outline: none;
+}
+.price-edit-input:focus { border-color: var(--primary); }
+
+/* ════════ AUTH ════════ */
+.auth-page {
+  min-height: calc(100vh - var(--top) - 60px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 30px 16px;
+}
+.auth-box {
+  background: var(--card); border: 1px solid var(--border-b);
+  border-radius: 16px; padding: 28px 24px;
+  width: 100%; max-width: 400px;
+}
+@media(min-width:500px){ .auth-box { padding: 36px 32px; } }
+.auth-box h2 { font-family: var(--font-dis); font-size: 1.5rem; margin-bottom: 6px; }
+.auth-box p { color: var(--text-dim); font-size: 0.88rem; margin-bottom: 24px; }
+.auth-switch { text-align: center; margin-top: 18px; font-size: 0.86rem; color: var(--text-dim); }
+.auth-switch a { color: var(--primary); font-weight: 600; }
+
+/* ════════ DOCS ════════ */
+.docs-sec { padding: 24px 0; }
+.docs-layout { display: flex; flex-direction: column; gap: 24px; }
+@media(min-width:900px){
+  .docs-layout { flex-direction: row; align-items: flex-start; }
+}
+.docs-nav {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+}
+@media(min-width:900px){
+  .docs-nav { width: 220px; flex-shrink: 0; position: sticky; top: calc(var(--top)+16px); }
+}
+.docs-nav h4 { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.docs-nav-link {
+  display: block; padding: 6px 10px; border-radius: 6px;
+  font-size: 0.84rem; color: var(--text-mid); margin-bottom: 2px;
+  transition: all 0.18s;
+}
+.docs-nav-link:hover { color: var(--primary); background: var(--primary-glow); }
+.docs-content { flex: 1; }
+.docs-content h3 {
+  font-family: var(--font-dis); font-size: 1.3rem;
+  color: var(--primary); margin: 28px 0 12px;
+}
+.docs-content h3:first-child { margin-top: 0; }
+.docs-content p { line-height: 1.8; color: var(--text-mid); margin-bottom: 14px; font-size: 0.92rem; }
+.docs-content ul { padding-left: 18px; color: var(--text-mid); line-height: 1.9; font-size: 0.92rem; margin-bottom: 14px; }
+.docs-ex {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 10px; padding: 16px; margin: 12px 0;
+}
+.docs-ex .ext { font-size: 0.72rem; color: var(--primary); font-family: var(--font-mono); margin-bottom: 8px; }
+.info-box {
+  background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 10px; padding: 14px; margin: 14px 0;
+  font-size: 0.88rem; color: var(--red); line-height: 1.7;
+}
+
+/* ════════ MODALS ════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(10,6,2,0.88); backdrop-filter: blur(8px);
+  display: none; align-items: flex-end; justify-content: center;
+  padding: 0;
+}
+@media(min-width:600px){
+  .modal-overlay { align-items: center; padding: 20px; }
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border-b);
+  width: 100%; max-width: 520px;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 32px;
+  max-height: 92vh; overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.25s ease;
+}
+@media(min-width:600px){
+  .modal { border-radius: 16px; border-radius: 16px; animation: fadeIn 0.2s ease; }
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+@keyframes fadeIn  { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
+.modal-handle {
+  width: 40px; height: 4px; background: var(--bg4);
+  border-radius: 2px; margin: 0 auto 16px;
+}
+@media(min-width:600px){ .modal-handle { display: none; } }
+.modal h3 { font-family: var(--font-dis); font-size: 1.25rem; margin-bottom: 20px; color: var(--primary); }
+.modal-close {
+  position: absolute; top: 18px; right: 18px;
+  background: var(--bg3); border: none; color: var(--text-dim);
+  width: 30px; height: 30px; border-radius: 50%; font-size: 1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { color: var(--text); background: var(--bg4); }
+
+/* Form elements */
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block; font-size: 0.78rem; color: var(--text-dim);
+  margin-bottom: 7px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.form-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 9px; padding: 10px 14px; color: var(--text);
+  font-family: var(--font-bn); font-size: 0.92rem; outline: none;
+  transition: border-color 0.18s; -webkit-appearance: none;
+}
+.form-input:focus { border-color: var(--primary); }
+select.form-input { cursor: pointer; background-image: none; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.sec-calc {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 9px; padding: 14px; margin-top: 6px;
+}
+.sc-row {
+  display: flex; justify-content: space-between;
+  font-size: 0.86rem; padding: 4px 0;
+}
+.sc-row span:last-child { font-family: var(--font-mono); }
+.sc-row.total {
+  border-top: 1px solid var(--border); margin-top: 8px;
+  padding-top: 10px; font-weight: 700; color: var(--primary);
+}
+
+/* Payment method buttons */
+.pm-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 14px; }
+@media(min-width:400px){ .pm-grid { grid-template-columns: repeat(5,1fr); } }
+.pm-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 6px; text-align: center;
+  cursor: pointer; transition: all 0.18s; font-size: 0.76rem; color: var(--text-mid);
+}
+.pm-btn:hover, .pm-btn.sel {
+  border-color: var(--border-b); color: var(--primary); background: var(--primary-glow);
+}
+.pm-icon { font-size: 1.2rem; margin-bottom: 4px; }
+
+/* Bid list */
+.bid-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.bid-item {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+}
+.bid-price { font-family: var(--font-mono); font-weight: 700; color: var(--primary); }
+.bid-time  { font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono); }
+
+/* ════════ TOAST ════════ */
+.toast-wrap {
+  position: fixed; bottom: 75px; right: 12px; left: 12px;
+  z-index: 500; display: flex; flex-direction: column;
+  align-items: flex-end; gap: 8px; pointer-events: none;
+}
+@media(min-width:900px){ .toast-wrap { bottom: 24px; left: auto; } }
+.toast {
+  background: var(--bg2); border: 1px solid var(--border-b);
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 0.86rem; max-width: 340px; width: 100%;
+  pointer-events: all;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow);
+  animation: toastIn 0.3s ease;
+}
+@keyframes toastIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red); }
+.toast.info    { border-left: 3px solid var(--primary); }
+
+/* ════════ SKELETON ════════ */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+
+/* ════════ UTILITIES ════════ */
+.text-primary { color: var(--primary); }
+.text-green   { color: var(--green); }
+.text-red     { color: var(--red); }
+.text-dim     { color: var(--text-dim); }
+.text-mid     { color: var(--text-mid); }
+.mono         { font-family: var(--font-mono); }
+.mt-8 { margin-top: 8px; }
+.mt-16{ margin-top: 16px; }
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-dim); font-size: 0.9rem; }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border); padding: 32px 0;
+  margin-top: 40px; display: none;
+}
+@media(min-width:900px){ footer { display: block; } }
+.foot-inner {
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 16px;
+}
+.foot-logo { font-family: var(--font-dis); color: var(--primary); }
+.foot-links { display: flex; gap: 16px; flex-wrap: wrap; }
+.foot-links a { color: var(--text-dim); font-size: 0.82rem; }
+.foot-links a:hover { color: var(--primary); }
+.foot-copy { font-size: 0.76rem; color: var(--text-dim); margin-top: 12px; }
+</style>
 </head>
-
 <body>
 
-  <!-- ════════ NAVBAR ════════ -->
-  <nav>
-    <a class="nav-logo" href="#" onclick="showPage('home');return false">
-      🌾 BazarFutures <small>ভবিষ্যতের বাজার</small>
-    </a>
-    <div class="nav-links">
-      <a href="#" onclick="showPage('home');return false" id="nl-home">হোম</a>
-      <a href="#" onclick="showPage('prices');return false" id="nl-prices">আজকের দাম</a>
-      <a href="#" onclick="showPage('contracts');return false" id="nl-contracts">কন্ট্র্যাক্ট</a>
-      <a href="#" onclick="showPage('history');return false" id="nl-history">দামের ইতিহাস</a>
-      <a href="#" onclick="showPage('docs');return false" id="nl-docs">গাইড</a>
-    </div>
-    <div class="nav-actions">
-      <a href="#" class="btn btn-outline btn-sm" id="loginBtn" onclick="showPage('login');return false">লগইন</a>
-      <a href="#" class="btn btn-solid btn-sm" id="regBtn" onclick="showPage('register');return false">রেজিস্ট্রেশন</a>
-      <a href="#" class="btn btn-ghost btn-sm" id="dashBtn" onclick="showPage('dashboard');return false"
-        style="display:none">👤 আমার</a>
-      <a href="#" class="btn btn-ghost btn-sm" id="adminBtn" onclick="showPage('admin');return false"
-        style="display:none;border-color:rgba(248,113,113,0.4);color:var(--red)">🔐 Admin</a>
-    </div>
-  </nav>
+<!-- ════════ NAVBAR ════════ -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home');return false">
+    🌾 BazarFutures <small>ভবিষ্যতের বাজার</small>
+  </a>
+  <div class="nav-links">
+    <a href="#" onclick="showPage('home');return false"     id="nl-home">হোম</a>
+    <a href="#" onclick="showPage('prices');return false"   id="nl-prices">আজকের দাম</a>
+    <a href="#" onclick="showPage('contracts');return false" id="nl-contracts">কন্ট্র্যাক্ট</a>
+    <a href="#" onclick="showPage('history');return false"  id="nl-history">দামের ইতিহাস</a>
+    <a href="#" onclick="showPage('docs');return false"     id="nl-docs">গাইড</a>
+  </div>
+  <div class="nav-actions">
+    <a href="#" class="btn btn-outline btn-sm" id="loginBtn" onclick="showPage('login');return false">লগইন</a>
+    <a href="#" class="btn btn-solid btn-sm"   id="regBtn"   onclick="showPage('register');return false">রেজিস্ট্রেশন</a>
+    <a href="#" class="btn btn-ghost btn-sm"   id="dashBtn"  onclick="showPage('dashboard');return false" style="display:none">👤 আমার</a>
+    <a href="#" class="btn btn-ghost btn-sm"   id="adminBtn" onclick="showPage('admin');return false"     style="display:none;border-color:rgba(248,113,113,0.4);color:var(--red)">🔐 Admin</a>
+  </div>
+</nav>
 
-  <!-- ════════ TICKER ════════ -->
-  <div class="ticker-bar">
-    <div class="ticker-label">LIVE</div>
-    <div class="ticker-wrap">
-      <div class="ticker-track" id="tickerTrack">
-        <div class="tick-item"><span>লোড হচ্ছে...</span></div>
-      </div>
+<!-- ════════ TICKER ════════ -->
+<div class="ticker-bar">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack">
+      <div class="tick-item"><span>লোড হচ্ছে...</span></div>
     </div>
   </div>
+</div>
 
-  <!-- ════════ MOBILE BOTTOM NAV ════════ -->
-  <nav class="mobile-nav">
-    <button class="mnav-item active" id="mn-home" onclick="showPage('home')"> <span class="mni">🏠</span>হোম</button>
-    <button class="mnav-item" id="mn-prices" onclick="showPage('prices')"> <span class="mni">📊</span>দাম</button>
-    <button class="mnav-item" id="mn-contracts" onclick="showPage('contracts')"> <span
-        class="mni">📝</span>কন্ট্র্যাক্ট</button>
-    <button class="mnav-item" id="mn-history" onclick="showPage('history')"> <span class="mni">📈</span>ইতিহাস</button>
-    <button class="mnav-item" id="mn-dashboard" onclick="showPage('dashboard')"> <span
-        class="mni">👤</span>আমার</button>
-  </nav>
+<!-- ════════ MOBILE BOTTOM NAV ════════ -->
+<nav class="mobile-nav">
+  <button class="mnav-item active" id="mn-home"      onclick="showPage('home')">      <span class="mni">🏠</span>হোম</button>
+  <button class="mnav-item"        id="mn-prices"    onclick="showPage('prices')">    <span class="mni">📊</span>দাম</button>
+  <button class="mnav-item"        id="mn-contracts" onclick="showPage('contracts')"> <span class="mni">📝</span>কন্ট্র্যাক্ট</button>
+  <button class="mnav-item"        id="mn-history"   onclick="showPage('history')">   <span class="mni">📈</span>ইতিহাস</button>
+  <button class="mnav-item"        id="mn-dashboard" onclick="showPage('dashboard')"> <span class="mni">👤</span>আমার</button>
+</nav>
 
-  <!-- ════════ TOAST ════════ -->
-  <div class="toast-wrap" id="toastWrap"></div>
+<!-- ════════ TOAST ════════ -->
+<div class="toast-wrap" id="toastWrap"></div>
 
-  <main>
+<main>
 
-    <!-- ══ HOME ══ -->
-    <div class="page active" id="page-home">
-      <div class="hero">
-        <div class="container">
-          <div class="hero-badge">
-            <div class="hero-dot"></div>LIVE · Chaldal মার্কেট রেট
-          </div>
-          <h1>পণ্যের <em>ভবিষ্যৎ দামে</em><br>এখনই চুক্তি করুন</h1>
-          <p>বাংলাদেশের প্রথম কৃষি-পণ্য ফিউচার কন্ট্র্যাক্ট প্ল্যাটফর্ম। মাত্র ১৫% জামানতে আজকেই ভবিষ্যৎ দামে চুক্তি
-            করুন।</p>
-          <div class="hero-btns">
-            <button class="btn btn-solid" onclick="showPage('contracts')">কন্ট্র্যাক্ট দেখুন →</button>
-            <button class="btn btn-outline" onclick="showPage('docs')">কিভাবে কাজ করে?</button>
-          </div>
-          <div class="hero-stats">
-            <div class="hstat">
-              <div class="num" id="hs-products">—</div>
-              <div class="lbl">সক্রিয় পণ্য</div>
-            </div>
-            <div class="hstat">
-              <div class="num" id="hs-contracts">—</div>
-              <div class="lbl">চলমান কন্ট্র্যাক্ট</div>
-            </div>
-            <div class="hstat">
-              <div class="num" id="hs-users">—</div>
-              <div class="lbl">ব্যবহারকারী</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="how-sec">
-        <div class="container">
-          <div class="sec-head" style="text-align:center">
-            <h2>কিভাবে কাজ করে?</h2>
-            <p>চারটি সহজ ধাপে ভবিষ্যৎ চুক্তি</p>
-          </div>
-          <div class="steps">
-            <div class="step-card">
-              <div class="step-n">০১</div>
-              <h4>কন্ট্র্যাক্ট তৈরি</h4>
-              <p>পণ্য, দাম, তারিখ বেছে মাত্র ১৫% জামানত দিন।</p>
-            </div>
-            <div class="step-card">
-              <div class="step-n">০২</div>
-              <h4>বিড / নেগোশিয়েট</h4>
-              <p>অন্যরা বিড করবে বা কাস্টম প্রপোজাল পাঠাবে।</p>
-            </div>
-            <div class="step-card">
-              <div class="step-n">০৩</div>
-              <h4>ম্যাচিউরিটি নিষ্পত্তি</h4>
-              <p>Chaldal দর অনুযায়ী স্বয়ংক্রিয় হিসাব হয়।</p>
-            </div>
-            <div class="step-card">
-              <div class="step-n">০৪</div>
-              <h4>টাকা তুলুন</h4>
-              <p>বিকাশ / নগদে লাভ তুলুন। ওয়েবসাইট ১% কমিশন নেয়।</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="movers-sec">
-        <div class="container">
-          <div class="sec-head">
-            <h2>আজকের পরিবর্তন</h2>
-            <p>Chaldal থেকে সর্বশেষ আপডেট</p>
-          </div>
-          <div class="price-grid" id="topMovers">
-            <div class="price-card">
-              <div class="skeleton" style="height:14px;width:70%;margin-bottom:8px"></div>
-              <div class="skeleton" style="height:24px;width:50%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ PRICES ══ -->
-    <div class="page" id="page-prices">
-      <div class="prices-sec">
-        <div class="container">
-          <div class="sec-head">
-            <h2>আজকের বাজার দর</h2>
-            <p>Chaldal থেকে সর্বশেষ আপডেট · <span class="mono text-primary" style="font-size:0.8rem"
-                id="lastUpdateTime">লোড হচ্ছে...</span></p>
-          </div>
-          <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterCat('all',this)">সব</button>
-            <button class="filter-btn" onclick="filterCat('সবজি',this)">🥬 সবজি</button>
-            <button class="filter-btn" onclick="filterCat('ফল',this)">🍌 ফল</button>
-            <button class="filter-btn" onclick="filterCat('ডাল/চাল',this)">🫘 ডাল/চাল</button>
-            <button class="filter-btn" onclick="filterCat('মশলা',this)">🌶 মশলা</button>
-            <button class="filter-btn" onclick="filterCat('ডেইরি',this)">🥛 ডেইরি</button>
-            <button class="filter-btn" onclick="filterCat('অন্যান্য',this)">📦 অন্যান্য</button>
-          </div>
-          <div class="search-row">
-            🔍 <input type="search" id="searchInput" placeholder="পণ্য খুঁজুন..." oninput="filterSearch(this.value)">
-          </div>
-          <div class="price-grid" id="priceGrid"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ CONTRACTS ══ -->
-    <div class="page" id="page-contracts">
-      <div class="contracts-sec">
-        <div class="container">
-          <div class="contracts-toolbar">
-            <div class="sec-head" style="margin-bottom:0">
-              <h2>কন্ট্র্যাক্ট বাজার</h2>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <div class="ctab-row">
-                <button class="ctab active" onclick="switchTab('open',this)">বিড খোলা</button>
-                <button class="ctab" onclick="switchTab(null,this)">সব</button>
-                <button class="ctab" onclick="switchTab('matched',this)">ম্যাচড</button>
-                <button class="ctab" onclick="switchTab('my',this)">আমার</button>
-              </div>
-              <button class="btn btn-solid btn-sm" onclick="openModal('createModal')">+ নতুন</button>
-            </div>
-          </div>
-          <div class="contract-list" id="contractList"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ HISTORY ══ -->
-    <div class="page" id="page-history">
-      <div class="history-sec">
-        <div class="container">
-          <div class="sec-head">
-            <h2>দামের ইতিহাস</h2>
-            <p>বাজার বিশ্লেষণ করুন ও স্মার্ট সিদ্ধান্ত নিন</p>
-          </div>
-          <div class="chart-box">
-            <div class="chart-sel-row">
-              <label>পণ্য:</label>
-              <select id="chartProductSel" class="form-input" onchange="onChartProductChange()">
-                <option value="">লোড হচ্ছে...</option>
-              </select>
-            </div>
-            <div class="chart-head">
-              <div>
-                <div class="chart-product-name" id="chartTitle">—</div>
-                <div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px">দৈনিক দাম · BDT</div>
-              </div>
-              <div class="chart-ranges">
-                <button class="rng-btn active" onclick="setRange(7,this)">৭দি</button>
-                <button class="rng-btn" onclick="setRange(30,this)">১মাস</button>
-                <button class="rng-btn" onclick="setRange(90,this)">৩মাস</button>
-                <button class="rng-btn" onclick="setRange(180,this)">৬মাস</button>
-              </div>
-            </div>
-            <div class="chart-area">
-              <div class="chart-canvas-wrap">
-                <canvas id="priceChart"></canvas>
-              </div>
-              <div class="chart-stats">
-                <div class="cs-item">
-                  <div class="cv text-primary" id="cs-cur">—</div>
-                  <div class="cl">বর্তমান</div>
-                </div>
-                <div class="cs-item">
-                  <div class="cv text-green" id="cs-hi">—</div>
-                  <div class="cl">সর্বোচ্চ</div>
-                </div>
-                <div class="cs-item">
-                  <div class="cv text-red" id="cs-lo">—</div>
-                  <div class="cl">সর্বনিম্ন</div>
-                </div>
-                <div class="cs-item">
-                  <div class="cv" id="cs-avg">—</div>
-                  <div class="cl">গড়</div>
-                </div>
-                <div class="cs-item">
-                  <div class="cv" id="cs-chg">—</div>
-                  <div class="cl">পরিবর্তন</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ DASHBOARD ══ -->
-    <div class="page" id="page-dashboard">
-      <div class="dash-sec">
-        <div class="container">
-          <div class="dash-layout">
-            <div class="dash-side">
-              <div class="dash-av">👤</div>
-              <div class="dash-name" id="dashName">লোড হচ্ছে...</div>
-              <div class="dash-email" id="dashEmail">—</div>
-              <div class="bal-box">
-                <label>মোট ব্যালেন্স</label>
-                <div class="amount" id="dashBal">৳—</div>
-                <div class="frozen" id="dashFrozen"></div>
-              </div>
-              <div class="dash-menu">
-                <button class="dmenu-item active">📊 ওভারভিউ</button>
-                <button class="dmenu-item"
-                  onclick="showPage('contracts');switchTab('my',document.querySelector('.ctab'))">📄 আমার
-                  কন্ট্র্যাক্ট</button>
-                <button class="dmenu-item" onclick="openModal('depositModal')">💰 টাকা জমা</button>
-                <button class="dmenu-item" onclick="openModal('withdrawModal')">💸 টাকা তুলুন</button>
-              </div>
-            </div>
-            <div class="dash-main">
-              <div class="dash-card">
-                <h4>💳 ওয়ালেট</h4>
-                <div class="wal-actions">
-                  <button class="btn btn-solid" onclick="openModal('depositModal')">↓ জমা করুন</button>
-                  <button class="btn btn-outline" onclick="openModal('withdrawModal')">↑ তুলুন</button>
-                </div>
-                <div class="txn-list" id="txnList">
-                  <div class="empty-state">লোড হচ্ছে...</div>
-                </div>
-              </div>
-              <div class="dash-card">
-                <h4>📄 আমার কন্ট্র্যাক্ট</h4>
-                <div id="myContracts">
-                  <div class="empty-state">লোড হচ্ছে...</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ ADMIN ══ -->
-    <div class="page" id="page-admin">
-      <div class="admin-sec">
-        <div class="container">
-          <div
-            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-            <div class="sec-head" style="margin-bottom:0">
-              <h2>অ্যাডমিন প্যানেল</h2>
-              <p style="color:var(--red)">🔐 সংরক্ষিত</p>
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-ghost btn-sm" onclick="triggerScrape()">🔄 Chaldal ফেচ</button>
-              <button class="btn btn-ghost btn-sm" onclick="triggerSettlement()">⚡ Settlement</button>
-            </div>
-          </div>
-          <div class="admin-stats">
-            <div class="astat">
-              <div class="an text-primary" id="as-prod">—</div>
-              <div class="al">পণ্য</div>
-            </div>
-            <div class="astat">
-              <div class="an text-primary" id="as-cont">—</div>
-              <div class="al">কন্ট্র্যাক্ট</div>
-            </div>
-            <div class="astat">
-              <div class="an" id="as-user">—</div>
-              <div class="al">ইউজার</div>
-            </div>
-            <div class="astat">
-              <div class="an text-green" id="as-comm">—</div>
-              <div class="al">কমিশন</div>
-            </div>
-            <div class="astat">
-              <div class="an text-red" id="as-pend">—</div>
-              <div class="al">পেন্ডিং</div>
-            </div>
-          </div>
-          <div class="admin-tabs">
-            <button class="atab active" onclick="switchAdminTab('prices',this)">💹 দাম আপডেট</button>
-            <button class="atab" onclick="switchAdminTab('products',this)">📦 পণ্য</button>
-            <button class="atab" onclick="switchAdminTab('contracts',this)">📄 কন্ট্র্যাক্ট</button>
-            <button class="atab" onclick="switchAdminTab('users',this)">👥 ইউজার</button>
-            <button class="atab" onclick="switchAdminTab('withdrawals',this)">💳 পেন্ডিং</button>
-          </div>
-
-          <div id="at-prices">
-            <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
-              <button class="btn btn-outline btn-sm" onclick="triggerScrape()">🔄 অটো ফেচ</button>
-              <button class="btn btn-solid btn-sm" onclick="saveAllPricesAPI()">💾 সব সেভ</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>পণ্য</th>
-                    <th>ইউনিট</th>
-                    <th>আগের দাম</th>
-                    <th>নতুন দাম</th>
-                    <th>অ্যাকশন</th>
-                  </tr>
-                </thead>
-                <tbody id="adminPriceTable"></tbody>
-              </table>
-            </div>
-          </div>
-          <div id="at-products" style="display:none">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-              <button class="btn btn-solid btn-sm" onclick="openModal('addProductModal')">+ নতুন পণ্য</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>পণ্য</th>
-                    <th>ক্যাটাগরি</th>
-                    <th>ইউনিট</th>
-                    <th>দাম</th>
-                    <th>স্ট্যাটাস</th>
-                    <th>অ্যাকশন</th>
-                  </tr>
-                </thead>
-                <tbody id="adminProductTable"></tbody>
-              </table>
-            </div>
-          </div>
-          <div id="at-contracts" style="display:none">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>কোড</th>
-                    <th>পণ্য</th>
-                    <th>পরিমাণ</th>
-                    <th>দাম</th>
-                    <th>তারিখ</th>
-                    <th>স্ট্যাটাস</th>
-                  </tr>
-                </thead>
-                <tbody id="adminContractTable"></tbody>
-              </table>
-            </div>
-          </div>
-          <div id="at-users" style="display:none">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>নাম</th>
-                    <th>ইমেইল</th>
-                    <th>ব্যালেন্স</th>
-                    <th>যোগদান</th>
-                    <th>অ্যাকশন</th>
-                  </tr>
-                </thead>
-                <tbody id="adminUserTable"></tbody>
-              </table>
-            </div>
-          </div>
-          <div id="at-withdrawals" style="display:none">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ইউজার</th>
-                    <th>পরিমাণ</th>
-                    <th>মাধ্যম</th>
-                    <th>নম্বর</th>
-                    <th>তারিখ</th>
-                    <th>অ্যাকশন</th>
-                  </tr>
-                </thead>
-                <tbody id="adminWithdrawalTable"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ DOCS ══ -->
-    <div class="page" id="page-docs">
-      <div class="docs-sec">
-        <div class="container">
-          <div class="docs-layout">
-            <div class="docs-nav">
-              <h4>বিষয়বস্তু</h4>
-              <a class="docs-nav-link" href="#">পরিচিতি</a>
-              <a class="docs-nav-link" href="#">রেজিস্ট্রেশন</a>
-              <a class="docs-nav-link" href="#">টাকা জমা/তোলা</a>
-              <a class="docs-nav-link" href="#">কন্ট্র্যাক্ট তৈরি</a>
-              <a class="docs-nav-link" href="#">বিড ও নেগোশিয়েশন</a>
-              <a class="docs-nav-link" href="#">নিষ্পত্তি</a>
-              <a class="docs-nav-link" href="#">উদাহরণ</a>
-              <a class="docs-nav-link" href="#">ঝুঁকি সতর্কতা</a>
-            </div>
-            <div class="docs-content">
-              <h3>BazarFutures কী?</h3>
-              <p>বাংলাদেশের প্রথম অনলাইন কৃষি-পণ্য ফিউচার কন্ট্র্যাক্ট প্ল্যাটফর্ম। আজকেই ভবিষ্যতের কোনো তারিখে একটি
-                পণ্য নির্দিষ্ট দামে কেনা বা বেচার চুক্তি করতে পারবেন।</p>
-              <p>সব পণ্যের দর <strong>Chaldal.com</strong> থেকে প্রতিদিন সকাল ৯টায় আপডেট হয়। কন্ট্র্যাক্ট ম্যাচিউরিটির
-                দিন সেই দিনের Chaldal দামের সাথে তুলনা করে স্বয়ংক্রিয়ভাবে হিসাব নিকাশ হয়।</p>
-              <h3>রেজিস্ট্রেশন</h3>
-              <p>শুধু <strong>নাম ও ইমেইল</strong> দিন — কোনো NID বা জটিল ডকুমেন্ট লাগে না। টাকা তোলার সময় বিকাশ/নগদ
-                নম্বর দিতে হবে।</p>
-              <h3>টাকা জমা ও তোলা</h3>
-              <ul>
-                <li><strong>বিকাশ</strong> — পার্সোনাল / Merchant পেমেন্ট</li>
-                <li><strong>নগদ</strong> — ডিজিটাল ট্রান্সফার</li>
-                <li><strong>রকেট</strong> — ডাচ-বাংলা মোবাইল ব্যাংকিং</li>
-                <li><strong>ব্যাংক ট্রান্সফার</strong> — NPSB/BEFTN</li>
-              </ul>
-              <div class="info-box">⚠️ ন্যূনতম জমা: ৳৫০০ | উইথড্র প্রসেসিং: ১-২ কার্যদিবস | চার্জ: ০%</div>
-              <h3>নিষ্পত্তি উদাহরণ</h3>
-              <div class="docs-ex">
-                <div class="ext">উদাহরণ — SELLER লাভ করলে</div>
-                <p>রাহেলা ১৫ এপ্রিলে ১০ ডজন ডিম ৳১২০/ডজনে বিক্রির চুক্তি করলেন। জামানত: ৳১৮০।<br>
-                  ম্যাচিউরিটিতে Chaldal দাম: ৳১২৫। কিন্তু contract দাম ৳১২০।<br>
-                  Seller gain = (১২০−১০৯)×১০ = ৳১১০ (buy price ছিল ৳১০৯)<br>
-                  Buyer ফেরত পাবে: ৳১৮০ − ৳১১০ = ৳৭০</p>
-              </div>
-              <div class="docs-ex">
-                <div class="ext">উদাহরণ — BUYER লাভ করলে</div>
-                <p>ম্যাচিউরিটিতে দাম কমে ৳১০০ হলো।<br>
-                  Buyer gain = (১০৯−১০০)×১০ = ৳৯০<br>
-                  Buyer পাবে: ৳১৮০ + ৳৯০ = ৳২৭০ | Seller হারাবে: ৳৯০</p>
-              </div>
-              <div class="info-box">⚠️ ফিউচার কন্ট্র্যাক্টে জামানতের সম্পূর্ণ অর্থ হারানোর ঝুঁকি থাকে। সাধ্যের বাইরে
-                বিনিয়োগ করবেন না।</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ LOGIN ══ -->
-    <div class="page" id="page-login">
-      <div class="auth-page">
-        <div class="auth-box">
-          <h2>স্বাগতম 👋</h2>
-          <p>আপনার অ্যাকাউন্টে লগইন করুন</p>
-          <div class="form-group"><label>ইমেইল</label><input type="email" class="form-input" id="loginEmail"
-              placeholder="your@email.com"></div>
-          <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" class="form-input" id="loginPass"
-              placeholder="••••••••"></div>
-          <button class="btn btn-solid btn-full mt-8" id="loginBtn2" onclick="handleLogin()">লগইন করুন</button>
-          <div class="auth-switch">নতুন? <a href="#" onclick="showPage('register');return false">রেজিস্ট্রেশন করুন</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ REGISTER ══ -->
-    <div class="page" id="page-register">
-      <div class="auth-page">
-        <div class="auth-box">
-          <h2>অ্যাকাউন্ট তৈরি করুন</h2>
-          <p>মাত্র নাম ও ইমেইল দিয়ে শুরু করুন</p>
-          <div class="form-group"><label>পুরো নাম</label><input type="text" class="form-input" id="regName"
-              placeholder="আপনার নাম"></div>
-          <div class="form-group"><label>ইমেইল</label><input type="email" class="form-input" id="regEmail"
-              placeholder="your@email.com"></div>
-          <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" class="form-input" id="regPass"
-              placeholder="কমপক্ষে ৬ অক্ষর"></div>
-          <button class="btn btn-solid btn-full mt-8" onclick="handleRegister()">রেজিস্ট্রেশন করুন</button>
-          <div class="auth-switch">ইতোমধ্যে আছেন? <a href="#" onclick="showPage('login');return false">লগইন করুন</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <footer>
+<!-- ══ HOME ══ -->
+<div class="page active" id="page-home">
+  <div class="hero">
     <div class="container">
-      <div class="foot-inner">
-        <div class="foot-logo">🌾 BazarFutures</div>
-        <div class="foot-links">
-          <a href="#" onclick="showPage('docs');return false">গাইড</a>
-          <a href="#">শর্তাবলী</a>
-          <a href="#">গোপনীয়তা</a>
-        </div>
+      <div class="hero-badge"><div class="hero-dot"></div>LIVE · Chaldal মার্কেট রেট</div>
+      <h1>পণ্যের <em>ভবিষ্যৎ দামে</em><br>এখনই চুক্তি করুন</h1>
+      <p>বাংলাদেশের প্রথম কৃষি-পণ্য ফিউচার কন্ট্র্যাক্ট প্ল্যাটফর্ম। মাত্র ১৫% জামানতে আজকেই ভবিষ্যৎ দামে চুক্তি করুন।</p>
+      <div class="hero-btns">
+        <button class="btn btn-solid" onclick="showPage('contracts')">কন্ট্র্যাক্ট দেখুন →</button>
+        <button class="btn btn-outline" onclick="showPage('docs')">কিভাবে কাজ করে?</button>
       </div>
-      <div class="foot-copy">© ২০২৬ BazarFutures · সব মূল্য Chaldal.com থেকে · ১% প্ল্যাটফর্ম কমিশন</div>
-    </div>
-  </footer>
-
-  <!-- ══ MODALS ══ -->
-
-  <!-- CREATE CONTRACT -->
-  <div class="modal-overlay" id="createModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <button class="modal-close" onclick="closeModal('createModal')">✕</button>
-      <h3>নতুন কন্ট্র্যাক্ট</h3>
-      <div class="form-group">
-        <label>পণ্য</label>
-        <select class="form-input" id="cc-product" onchange="calcSecurity()">
-          <option value="">পণ্য বেছে নিন</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>পরিমাণ (ইউনিট)</label>
-          <input type="number" class="form-input" id="cc-qty" placeholder="যেমন: ১০" oninput="calcSecurity()" min="1"
-            step="1">
-        </div>
-        <div class="form-group">
-          <label>চুক্তির দাম (৳)</label>
-          <input type="number" class="form-input" id="cc-price" placeholder="যেমন: ১২০" oninput="calcSecurity()" min="0"
-            step="0.5">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>ম্যাচিউরিটি তারিখ</label>
-        <input type="date" class="form-input" id="cc-date">
-      </div>
-      <div class="form-group">
-        <label>ধরন</label>
-        <select class="form-input" id="cc-type">
-          <option value="sell">SELL — আমি বিক্রি করব</option>
-          <option value="buy">BUY — আমি কিনব</option>
-        </select>
-      </div>
-      <div class="sec-calc" id="secCalc">
-        <div class="sc-row"><span>মোট মূল্য</span><span id="sc-total">৳০</span></div>
-        <div class="sc-row"><span>জামানত হার</span><span>১৫%</span></div>
-        <div class="sc-row total"><span>প্রদেয় জামানত</span><span id="sc-sec">৳০</span></div>
-      </div>
-      <div class="form-group mt-16">
-        <label>বিশেষ শর্ত (ঐচ্ছিক)</label>
-        <textarea class="form-input" id="cc-terms" rows="2" placeholder="বিশেষ শর্ত..."></textarea>
-      </div>
-      <button class="btn btn-solid btn-full mt-8" onclick="submitCreateContract()">কন্ট্র্যাক্ট তৈরি করুন →</button>
-    </div>
-  </div>
-
-  <!-- BID MODAL -->
-  <div class="modal-overlay" id="bidModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <button class="modal-close" onclick="closeModal('bidModal')">✕</button>
-      <h3 id="bidModalTitle">বিড করুন</h3>
-      <div class="bid-list" id="existingBids"></div>
-      <div class="divider"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>বিডের দাম (৳)</label>
-          <input type="number" class="form-input" id="bid-price" placeholder="দাম লিখুন" step="0.5">
-        </div>
-        <div class="form-group">
-          <label>পরিমাণ</label>
-          <input type="number" class="form-input" id="bid-qty" placeholder="পরিমাণ">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>কাস্টম তারিখ (ঐচ্ছিক)</label>
-        <input type="date" class="form-input" id="bid-date">
-      </div>
-      <div class="form-group">
-        <label>বার্তা</label>
-        <textarea class="form-input" id="bid-msg" rows="2" placeholder="Seller কে বার্তা..."></textarea>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-solid" style="flex:1" onclick="submitBid()">বিড করুন</button>
-        <button class="btn btn-ghost" style="flex:1" onclick="submitProposal()">📩 প্রপোজাল</button>
+      <div class="hero-stats">
+        <div class="hstat"><div class="num" id="hs-products">—</div><div class="lbl">সক্রিয় পণ্য</div></div>
+        <div class="hstat"><div class="num" id="hs-contracts">—</div><div class="lbl">চলমান কন্ট্র্যাক্ট</div></div>
+        <div class="hstat"><div class="num" id="hs-users">—</div><div class="lbl">ব্যবহারকারী</div></div>
       </div>
     </div>
   </div>
 
-  <!-- DEPOSIT -->
-  <div class="modal-overlay" id="depositModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
-      <h3>টাকা জমা করুন</h3>
-      <div class="pm-grid">
-        <div class="pm-btn sel" onclick="selPM(this,'bkash')">
-          <div class="pm-icon">📱</div>বিকাশ
-        </div>
-        <div class="pm-btn" onclick="selPM(this,'nagad')">
-          <div class="pm-icon">💚</div>নগদ
-        </div>
-        <div class="pm-btn" onclick="selPM(this,'rocket')">
-          <div class="pm-icon">🟣</div>রকেট
-        </div>
-        <div class="pm-btn" onclick="selPM(this,'bank')">
-          <div class="pm-icon">🏦</div>ব্যাংক
-        </div>
+  <div class="how-sec">
+    <div class="container">
+      <div class="sec-head" style="text-align:center">
+        <h2>কিভাবে কাজ করে?</h2>
+        <p>চারটি সহজ ধাপে ভবিষ্যৎ চুক্তি</p>
       </div>
-      <input type="hidden" id="dep-pm" value="bkash">
-      <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" class="form-input" id="dep-amount"
-          placeholder="ন্যূনতম ৳৫০০" min="500"></div>
-      <div class="form-group"><label>আপনার নম্বর</label><input type="text" class="form-input" id="dep-acc"
-          placeholder="01XXXXXXXXX"></div>
-      <div
-        style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px;margin:12px 0;font-size:0.84rem;color:var(--text-mid)">
-        📌 এই নম্বরে পাঠান: <strong class="mono">01XXXXXXXX (BazarFutures)</strong><br>তারপর TrxID দিন
+      <div class="steps">
+        <div class="step-card"><div class="step-n">০১</div><h4>কন্ট্র্যাক্ট তৈরি</h4><p>পণ্য, দাম, তারিখ বেছে মাত্র ১৫% জামানত দিন।</p></div>
+        <div class="step-card"><div class="step-n">০২</div><h4>বিড / নেগোশিয়েট</h4><p>অন্যরা বিড করবে বা কাস্টম প্রপোজাল পাঠাবে।</p></div>
+        <div class="step-card"><div class="step-n">০৩</div><h4>ম্যাচিউরিটি নিষ্পত্তি</h4><p>Chaldal দর অনুযায়ী স্বয়ংক্রিয় হিসাব হয়।</p></div>
+        <div class="step-card"><div class="step-n">০৪</div><h4>টাকা তুলুন</h4><p>বিকাশ / নগদে লাভ তুলুন। ওয়েবসাইট ১% কমিশন নেয়।</p></div>
       </div>
-      <div class="form-group"><label>ট্রানজেকশন ID (TrxID)</label><input type="text" class="form-input" id="dep-txn"
-          placeholder="যেমন: AB1234567"></div>
-      <button class="btn btn-solid btn-full" onclick="submitDeposit()">জমার আবেদন করুন</button>
     </div>
   </div>
 
-  <!-- WITHDRAW -->
-  <div class="modal-overlay" id="withdrawModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <button class="modal-close" onclick="closeModal('withdrawModal')">✕</button>
-      <h3>টাকা তুলুন</h3>
-      <div class="pm-grid">
-        <div class="pm-btn sel" onclick="selPM(this,'bkash')">
-          <div class="pm-icon">📱</div>বিকাশ
-        </div>
-        <div class="pm-btn" onclick="selPM(this,'nagad')">
-          <div class="pm-icon">💚</div>নগদ
-        </div>
-        <div class="pm-btn" onclick="selPM(this,'rocket')">
-          <div class="pm-icon">🟣</div>রকেট
-        </div>
-        <div class="pm-btn" onclick="selPM(this,'bank')">
-          <div class="pm-icon">🏦</div>ব্যাংক
-        </div>
+  <div class="movers-sec">
+    <div class="container">
+      <div class="sec-head">
+        <h2>আজকের পরিবর্তন</h2>
+        <p>Chaldal থেকে সর্বশেষ আপডেট</p>
       </div>
-      <input type="hidden" id="wd-pm" value="bkash">
-      <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" class="form-input" id="wd-amount"
-          placeholder="ন্যূনতম ৳২০০" min="200"></div>
-      <div class="form-group"><label>আপনার নম্বর</label><input type="text" class="form-input" id="wd-acc"
-          placeholder="01XXXXXXXXX"></div>
-      <div
-        style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px;margin:12px 0;font-size:0.82rem;color:var(--text-dim)">
-        ১-২ কার্যদিবসে প্রক্রিয়া হবে · চার্জ: ০%
+      <div class="price-grid" id="topMovers">
+        <div class="price-card"><div class="skeleton" style="height:14px;width:70%;margin-bottom:8px"></div><div class="skeleton" style="height:24px;width:50%"></div></div>
       </div>
-      <button class="btn btn-solid btn-full" onclick="submitWithdraw()">উইথড্র আবেদন করুন</button>
     </div>
   </div>
+</div>
 
-  <!-- ADD PRODUCT -->
-  <div class="modal-overlay" id="addProductModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
-      <h3>নতুন পণ্য যোগ করুন</h3>
-      <div class="form-group"><label>পণ্যের নাম (বাংলা)</label><input class="form-input" id="np-bn"
-          placeholder="যেমন: ব্রয়লার ডিম"></div>
-      <div class="form-group"><label>পণ্যের নাম (ইংরেজি)</label><input class="form-input" id="np-en"
-          placeholder="Broiler Eggs"></div>
-      <div class="form-row">
-        <div class="form-group"><label>ইউনিট</label><input class="form-input" id="np-unit" placeholder="12 pcs"></div>
-        <div class="form-group"><label>ক্যাটাগরি</label>
-          <select class="form-input" id="np-cat">
-            <option value="সবজি">সবজি</option>
-            <option value="ফল">ফল</option>
-            <option value="ডাল/চাল">ডাল/চাল</option>
-            <option value="মশলা">মশলা</option>
-            <option value="ডেইরি">ডেইরি</option>
-            <option value="অন্যান্য">অন্যান্য</option>
+<!-- ══ PRICES ══ -->
+<div class="page" id="page-prices">
+  <div class="prices-sec">
+    <div class="container">
+      <div class="sec-head">
+        <h2>আজকের বাজার দর</h2>
+        <p>Chaldal থেকে সর্বশেষ আপডেট · <span class="mono text-primary" style="font-size:0.8rem" id="lastUpdateTime">লোড হচ্ছে...</span></p>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterCat('all',this)">সব</button>
+        <button class="filter-btn" onclick="filterCat('সবজি',this)">🥬 সবজি</button>
+        <button class="filter-btn" onclick="filterCat('ফল',this)">🍌 ফল</button>
+        <button class="filter-btn" onclick="filterCat('ডাল/চাল',this)">🫘 ডাল/চাল</button>
+        <button class="filter-btn" onclick="filterCat('মশলা',this)">🌶 মশলা</button>
+        <button class="filter-btn" onclick="filterCat('ডেইরি',this)">🥛 ডেইরি</button>
+        <button class="filter-btn" onclick="filterCat('অন্যান্য',this)">📦 অন্যান্য</button>
+      </div>
+      <div class="search-row">
+        🔍 <input type="search" id="searchInput" placeholder="পণ্য খুঁজুন..." oninput="filterSearch(this.value)">
+      </div>
+      <div class="price-grid" id="priceGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTRACTS ══ -->
+<div class="page" id="page-contracts">
+  <div class="contracts-sec">
+    <div class="container">
+      <div class="contracts-toolbar">
+        <div class="sec-head" style="margin-bottom:0">
+          <h2>কন্ট্র্যাক্ট বাজার</h2>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="ctab-row">
+            <button class="ctab active" onclick="switchTab('open',this)">বিড খোলা</button>
+            <button class="ctab" onclick="switchTab(null,this)">সব</button>
+            <button class="ctab" onclick="switchTab('matched',this)">ম্যাচড</button>
+            <button class="ctab" onclick="switchTab('my',this)">আমার</button>
+          </div>
+          <button class="btn btn-solid btn-sm" onclick="openModal('createModal')">+ নতুন</button>
+        </div>
+      </div>
+      <div class="contract-list" id="contractList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div class="page" id="page-history">
+  <div class="history-sec">
+    <div class="container">
+      <div class="sec-head">
+        <h2>দামের ইতিহাস</h2>
+        <p>বাজার বিশ্লেষণ করুন ও স্মার্ট সিদ্ধান্ত নিন</p>
+      </div>
+      <div class="chart-box">
+        <div class="chart-sel-row">
+          <label>পণ্য:</label>
+          <select id="chartProductSel" class="form-input" onchange="onChartProductChange()">
+            <option value="">লোড হচ্ছে...</option>
           </select>
         </div>
+        <div class="chart-head">
+          <div>
+            <div class="chart-product-name" id="chartTitle">—</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px">দৈনিক দাম · BDT</div>
+          </div>
+          <div class="chart-ranges">
+            <button class="rng-btn active" onclick="setRange(7,this)">৭দি</button>
+            <button class="rng-btn" onclick="setRange(30,this)">১মাস</button>
+            <button class="rng-btn" onclick="setRange(90,this)">৩মাস</button>
+            <button class="rng-btn" onclick="setRange(180,this)">৬মাস</button>
+          </div>
+        </div>
+        <div class="chart-area">
+          <div class="chart-canvas-wrap">
+            <canvas id="priceChart"></canvas>
+          </div>
+          <div class="chart-stats">
+            <div class="cs-item"><div class="cv text-primary" id="cs-cur">—</div><div class="cl">বর্তমান</div></div>
+            <div class="cs-item"><div class="cv text-green"   id="cs-hi">—</div><div class="cl">সর্বোচ্চ</div></div>
+            <div class="cs-item"><div class="cv text-red"     id="cs-lo">—</div><div class="cl">সর্বনিম্ন</div></div>
+            <div class="cs-item"><div class="cv"              id="cs-avg">—</div><div class="cl">গড়</div></div>
+            <div class="cs-item"><div class="cv"              id="cs-chg">—</div><div class="cl">পরিবর্তন</div></div>
+          </div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>বর্তমান দাম (৳)</label><input type="number" class="form-input" id="np-price"
-            placeholder="Chaldal দাম"></div>
-        <div class="form-group"><label>Chaldal URL</label><input class="form-input" id="np-url"
-            placeholder="https://chaldal.com/..."></div>
-      </div>
-      <button class="btn btn-solid btn-full" onclick="submitAddProduct()">পণ্য যোগ করুন</button>
     </div>
   </div>
+</div>
 
-  <script>
-    /* ════════════════════════════════════
-       CORE: PAGE SWITCHING
-    ════════════════════════════════════ */
-    let _currentPage = 'home';
-    function showPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const el = document.getElementById('page-' + id);
-      if (el) { el.classList.add('active'); _currentPage = id; }
+<!-- ══ DASHBOARD ══ -->
+<div class="page" id="page-dashboard">
+  <div class="dash-sec">
+    <div class="container">
+      <div class="dash-layout">
+        <div class="dash-side">
+          <div class="dash-av">👤</div>
+          <div class="dash-name" id="dashName">লোড হচ্ছে...</div>
+          <div class="dash-email" id="dashEmail">—</div>
+          <div class="bal-box">
+            <label>মোট ব্যালেন্স</label>
+            <div class="amount" id="dashBal">৳—</div>
+            <div class="frozen" id="dashFrozen"></div>
+          </div>
+          <div class="dash-menu">
+            <button class="dmenu-item active">📊 ওভারভিউ</button>
+            <button class="dmenu-item" onclick="showPage('contracts');switchTab('open',document.querySelector('.ctab'))">🛒 কন্ট্র্যাক্ট বাজার</button>
+            <button class="dmenu-item" onclick="showPage('contracts');switchTab('my',document.querySelectorAll('.ctab')[3])">📄 আমার কন্ট্র্যাক্ট</button>
+            <button class="dmenu-item" onclick="openModal('depositModal')">💰 টাকা জমা</button>
+            <button class="dmenu-item" onclick="openModal('withdrawModal')">💸 টাকা তুলুন</button>
+            <button class="dmenu-item" onclick="showPage('history')">📈 দামের ইতিহাস</button>
+            <button class="dmenu-item" onclick="showPage('docs')">📖 গাইড</button>
+            <div style="height:1px;background:var(--border);margin:8px 0"></div>
+            <button class="dmenu-item" onclick="doLogout()" style="color:var(--red)">🚪 লগআউট</button>
+          </div>
+        </div>
+        <div class="dash-main">
+          <div class="dash-card">
+            <h4>💳 ওয়ালেট</h4>
+            <div class="wal-actions">
+              <button class="btn btn-solid" onclick="openModal('depositModal')">↓ জমা করুন</button>
+              <button class="btn btn-outline" onclick="openModal('withdrawModal')">↑ তুলুন</button>
+            </div>
+            <div class="txn-list" id="txnList"><div class="empty-state">লোড হচ্ছে...</div></div>
+          </div>
+          <div class="dash-card">
+            <h4>📄 আমার কন্ট্র্যাক্ট</h4>
+            <div id="myContracts"><div class="empty-state">লোড হচ্ছে...</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-      // Desktop nav
-      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-      const nl = document.getElementById('nl-' + id);
-      if (nl) nl.classList.add('active');
+<!-- ══ ADMIN ══ -->
+<div class="page" id="page-admin">
+  <div class="admin-sec">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div class="sec-head" style="margin-bottom:0"><h2>অ্যাডমিন প্যানেল</h2><p style="color:var(--red)">🔐 সংরক্ষিত</p></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="triggerScrape()">🔄 Chaldal ফেচ</button>
+          <button class="btn btn-ghost btn-sm" onclick="triggerSettlement()">⚡ Settlement</button>
+        </div>
+      </div>
+      <div class="admin-stats">
+        <div class="astat"><div class="an text-primary" id="as-prod">—</div><div class="al">পণ্য</div></div>
+        <div class="astat"><div class="an text-primary" id="as-cont">—</div><div class="al">কন্ট্র্যাক্ট</div></div>
+        <div class="astat"><div class="an"             id="as-user">—</div><div class="al">ইউজার</div></div>
+        <div class="astat"><div class="an text-green"  id="as-comm">—</div><div class="al">কমিশন</div></div>
+        <div class="astat"><div class="an text-red"    id="as-pend">—</div><div class="al">পেন্ডিং</div></div>
+      </div>
+      <div class="admin-tabs">
+        <button class="atab active" onclick="switchAdminTab('prices',this)">💹 দাম আপডেট</button>
+        <button class="atab" onclick="switchAdminTab('products',this)">📦 পণ্য</button>
+        <button class="atab" onclick="switchAdminTab('contracts',this)">📄 কন্ট্র্যাক্ট</button>
+        <button class="atab" onclick="switchAdminTab('users',this)">👥 ইউজার</button>
+        <button class="atab" onclick="switchAdminTab('withdrawals',this)">💳 পেন্ডিং</button>
+      </div>
 
-      // Mobile nav
-      document.querySelectorAll('.mnav-item').forEach(b => b.classList.remove('active'));
-      const mn = document.getElementById('mn-' + id);
-      if (mn) mn.classList.add('active');
+      <div id="at-prices">
 
-      window.scrollTo(0, 0);
-    }
+        <!-- ── STEP BAR ── -->
+        <div id="priceStepBar" style="display:flex;align-items:center;gap:0;margin-bottom:20px;border-radius:12px;overflow:hidden;border:1px solid var(--border)">
+          <div class="pstep active" id="ps1" style="flex:1;padding:12px 16px;display:flex;align-items:center;gap:8px;font-size:0.84rem;font-weight:600;background:var(--primary-glow);color:var(--primary);border-right:1px solid var(--border)">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--primary);color:#1a1208;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0">১</span>
+            Chaldal থেকে দাম আনুন
+          </div>
+          <div class="pstep" id="ps2" style="flex:1;padding:12px 16px;display:flex;align-items:center;gap:8px;font-size:0.84rem;color:var(--text-dim);border-right:1px solid var(--border)">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--bg4);color:var(--text-dim);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0">২</span>
+            প্রিভিউ ও সম্পাদনা
+          </div>
+          <div class="pstep" id="ps3" style="flex:1;padding:12px 16px;display:flex;align-items:center;gap:8px;font-size:0.84rem;color:var(--text-dim)">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--bg4);color:var(--text-dim);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0">৩</span>
+            সেভ ও প্রকাশ
+          </div>
+        </div>
 
-    /* ════════════════════════════════════
-       MODALS
-    ════════════════════════════════════ */
-    function openModal(id) {
-      document.getElementById(id).classList.add('open');
-      document.body.style.overflow = 'hidden';
-      if (id === 'createModal') populateProductDropdown();
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    document.querySelectorAll('.modal-overlay').forEach(m => {
-      m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
-    });
+        <!-- ── STEP 1: FETCH ── -->
+        <div id="priceStep1">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px;text-align:center">
+            <div style="font-size:2.5rem;margin-bottom:12px">🌐</div>
+            <h3 style="font-family:var(--font-dis);font-size:1.2rem;margin-bottom:8px">Chaldal থেকে দাম আনুন</h3>
+            <p style="color:var(--text-dim);font-size:0.86rem;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto">
+              Chaldal URL আছে এমন সব পণ্যের সর্বশেষ দাম fetch করা হবে। DB তে এখনই save হবে না — আপনি আগে দেখতে ও সম্পাদনা করতে পারবেন।
+            </p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+              <button class="btn btn-solid" id="fetchBtn" onclick="startFetchPreview()">
+                🔄 Chaldal থেকে দাম আনুন
+              </button>
+              <button class="btn btn-ghost" onclick="loadAdminManualPrices()">
+                ✏️ ম্যানুয়াল আপডেট
+              </button>
+            </div>
+            <p style="color:var(--text-dim);font-size:0.78rem;margin-top:16px">
+              ⏱️ প্রথমবার fetch করতে ৩০-৬০ সেকেন্ড লাগতে পারে
+            </p>
+          </div>
+        </div>
 
-    /* ════════════════════════════════════
-       PAYMENT METHOD SELECTOR
-    ════════════════════════════════════ */
-    let _depPM = 'bkash', _wdPM = 'bkash';
-    function selPM(btn, pm) {
-      const grid = btn.closest('.pm-grid');
-      grid.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('sel'));
-      btn.classList.add('sel');
-      const hiddenId = btn.closest('.modal').querySelector('input[type=hidden]')?.id;
-      if (hiddenId) document.getElementById(hiddenId).value = pm;
-    }
+        <!-- ── STEP 2: PREVIEW ── (hidden initially) -->
+        <div id="priceStep2" style="display:none">
+          <!-- Summary bar -->
+          <div id="fetchSummary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+          <!-- Filter + Save row -->
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <div style="display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px">
+              <button class="btn btn-xs active" id="pf-all"     onclick="filterPreview('all',this)">সব</button>
+              <button class="btn btn-xs"        id="pf-changed" onclick="filterPreview('changed',this)">পরিবর্তিত</button>
+              <button class="btn btn-xs"        id="pf-failed"  onclick="filterPreview('failed',this)">ব্যর্থ</button>
+              <button class="btn btn-xs"        id="pf-nourl"   onclick="filterPreview('no_url',this)">URL নেই</button>
+            </div>
+            <span style="color:var(--text-dim);font-size:0.8rem;font-family:var(--font-mono)" id="previewCount"></span>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" onclick="backToStep1()">← ফিরে যান</button>
+              <button class="btn btn-solid btn-sm" id="saveAllBtn" onclick="savePreviewedPrices()">
+                💾 পরিবর্তিত দাম সেভ করুন
+              </button>
+            </div>
+          </div>
+          <!-- Preview table -->
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="checkAll" onchange="toggleAllChecks(this)" style="accent-color:var(--primary)"> সব</th>
+                <th>পণ্য</th>
+                <th>ইউনিট</th>
+                <th>আগের দাম</th>
+                <th>Chaldal দাম</th>
+                <th>নতুন দাম (সম্পাদনা করুন)</th>
+                <th>পরিবর্তন</th>
+                <th>স্ট্যাটাস</th>
+              </tr></thead>
+              <tbody id="pricePreviewTable"></tbody>
+            </table>
+          </div>
+        </div>
 
-    /* ════════════════════════════════════
-       SECURITY CALCULATOR
-    ════════════════════════════════════ */
-    function calcSecurity() {
-      const qty = parseFloat(document.getElementById('cc-qty')?.value) || 0;
-      const price = parseFloat(document.getElementById('cc-price')?.value) || 0;
-      const total = qty * price;
-      const sec = Math.round(total * 0.15 * 100) / 100;
-      if (document.getElementById('sc-total')) document.getElementById('sc-total').textContent = '৳' + total.toFixed(2);
-      if (document.getElementById('sc-sec')) document.getElementById('sc-sec').textContent = '৳' + sec.toFixed(2);
-    }
+        <!-- ── STEP 3: SAVED ── (hidden initially) -->
+        <div id="priceStep3" style="display:none">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center">
+            <div style="font-size:3rem;margin-bottom:12px">✅</div>
+            <h3 style="font-family:var(--font-dis);font-size:1.3rem;margin-bottom:8px">দাম সফলভাবে আপডেট হয়েছে!</h3>
+            <p style="color:var(--text-dim);font-size:0.86rem;margin-bottom:8px" id="savedSummary"></p>
+            <p style="color:var(--text-dim);font-size:0.78rem;margin-bottom:24px">আজকের তারিখ ও সময়: <span class="mono text-primary" id="savedTime"></span></p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+              <button class="btn btn-solid" onclick="backToStep1()">🔄 আবার আপডেট করুন</button>
+              <button class="btn btn-ghost" onclick="switchAdminTab('products',null)">📦 পণ্য দেখুন</button>
+            </div>
+          </div>
+        </div>
 
-    /* ════════════════════════════════════
-       TOAST
-    ════════════════════════════════════ */
-    function showToast(msg, type = 'info') {
-      const wrap = document.getElementById('toastWrap');
-      const t = document.createElement('div');
-      t.className = `toast ${type}`;
-      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-      t.innerHTML = `<span>${icon}</span><span style="flex:1">${msg}</span>`;
-      wrap.appendChild(t);
-      setTimeout(() => t.remove(), 4000);
-    }
+        <!-- ── MANUAL PRICE TABLE ── (shown when "manual" clicked) -->
+        <div id="priceManual" style="display:none">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+            <h4 style="font-size:0.9rem;color:var(--text-mid)">✏️ ম্যানুয়াল দাম আপডেট</h4>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" onclick="backToStep1()">← ফিরে যান</button>
+              <button class="btn btn-solid btn-sm" onclick="saveAllPricesAPI()">💾 সব সেভ করুন</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>পণ্য</th><th>ইউনিট</th><th>বর্তমান দাম</th><th>নতুন দাম (৳)</th><th>অ্যাকশন</th></tr></thead>
+            <tbody id="adminPriceTable"></tbody>
+          </table></div>
+        </div>
 
-    /* ════════════════════════════════════
-       ADMIN TAB SWITCHER
-    ════════════════════════════════════ */
-    function switchAdminTab(tab, btn) {
-      ['prices', 'products', 'contracts', 'users', 'withdrawals'].forEach(t => {
-        const el = document.getElementById('at-' + t);
-        if (el) el.style.display = t === tab ? '' : 'none';
-      });
-      document.querySelectorAll('.atab').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-    }
+      </div>
+      <div id="at-products" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-solid btn-sm" onclick="openModal('addProductModal')">+ নতুন পণ্য</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>পণ্য</th><th>ক্যাটাগরি</th><th>ইউনিট</th><th>দাম</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+          <tbody id="adminProductTable"></tbody>
+        </table></div>
+      </div>
+      <div id="at-contracts" style="display:none">
+        <div class="table-wrap"><table>
+          <thead><tr><th>কোড</th><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>তারিখ</th><th>স্ট্যাটাস</th></tr></thead>
+          <tbody id="adminContractTable"></tbody>
+        </table></div>
+      </div>
+      <div id="at-users" style="display:none">
+        <div class="table-wrap"><table>
+          <thead><tr><th>নাম</th><th>ইমেইল</th><th>ব্যালেন্স</th><th>যোগদান</th><th>অ্যাকশন</th></tr></thead>
+          <tbody id="adminUserTable"></tbody>
+        </table></div>
+      </div>
+      <div id="at-withdrawals" style="display:none">
+        <div class="table-wrap"><table>
+          <thead><tr><th>ইউজার</th><th>পরিমাণ</th><th>মাধ্যম</th><th>নম্বর</th><th>তারিখ</th><th>অ্যাকশন</th></tr></thead>
+          <tbody id="adminWithdrawalTable"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    /* ════════════════════════════════════
-       CONTRACT TAB SWITCHER (static)
-    ════════════════════════════════════ */
-    function switchTab(status, btn) {
-      // overridden by api.js
-    }
+<!-- ══ DOCS ══ -->
+<div class="page" id="page-docs">
+  <div class="docs-sec"><div class="container">
+    <div class="docs-layout">
+      <div class="docs-nav">
+        <h4>বিষয়বস্তু</h4>
+        <a class="docs-nav-link" href="#">পরিচিতি</a>
+        <a class="docs-nav-link" href="#">রেজিস্ট্রেশন</a>
+        <a class="docs-nav-link" href="#">টাকা জমা/তোলা</a>
+        <a class="docs-nav-link" href="#">কন্ট্র্যাক্ট তৈরি</a>
+        <a class="docs-nav-link" href="#">বিড ও নেগোশিয়েশন</a>
+        <a class="docs-nav-link" href="#">নিষ্পত্তি</a>
+        <a class="docs-nav-link" href="#">উদাহরণ</a>
+        <a class="docs-nav-link" href="#">ঝুঁকি সতর্কতা</a>
+      </div>
+      <div class="docs-content">
+        <h3>BazarFutures কী?</h3>
+        <p>বাংলাদেশের প্রথম অনলাইন কৃষি-পণ্য ফিউচার কন্ট্র্যাক্ট প্ল্যাটফর্ম। আজকেই ভবিষ্যতের কোনো তারিখে একটি পণ্য নির্দিষ্ট দামে কেনা বা বেচার চুক্তি করতে পারবেন।</p>
+        <p>সব পণ্যের দর <strong>Chaldal.com</strong> থেকে প্রতিদিন সকাল ৯টায় আপডেট হয়। কন্ট্র্যাক্ট ম্যাচিউরিটির দিন সেই দিনের Chaldal দামের সাথে তুলনা করে স্বয়ংক্রিয়ভাবে হিসাব নিকাশ হয়।</p>
+        <h3>রেজিস্ট্রেশন</h3>
+        <p>শুধু <strong>নাম ও ইমেইল</strong> দিন — কোনো NID বা জটিল ডকুমেন্ট লাগে না। টাকা তোলার সময় বিকাশ/নগদ নম্বর দিতে হবে।</p>
+        <h3>টাকা জমা ও তোলা</h3>
+        <ul>
+          <li><strong>বিকাশ</strong> — পার্সোনাল / Merchant পেমেন্ট</li>
+          <li><strong>নগদ</strong> — ডিজিটাল ট্রান্সফার</li>
+          <li><strong>রকেট</strong> — ডাচ-বাংলা মোবাইল ব্যাংকিং</li>
+          <li><strong>ব্যাংক ট্রান্সফার</strong> — NPSB/BEFTN</li>
+        </ul>
+        <div class="info-box">⚠️ ন্যূনতম জমা: ৳৫০০ | উইথড্র প্রসেসিং: ১-২ কার্যদিবস | চার্জ: ০%</div>
+        <h3>নিষ্পত্তি উদাহরণ</h3>
+        <div class="docs-ex">
+          <div class="ext">উদাহরণ — SELLER লাভ করলে</div>
+          <p>রাহেলা ১৫ এপ্রিলে ১০ ডজন ডিম ৳১২০/ডজনে বিক্রির চুক্তি করলেন। জামানত: ৳১৮০।<br>
+          ম্যাচিউরিটিতে Chaldal দাম: ৳১২৫। কিন্তু contract দাম ৳১২০।<br>
+          Seller gain = (১২০−১০৯)×১০ = ৳১১০ (buy price ছিল ৳১০৯)<br>
+          Buyer ফেরত পাবে: ৳১৮০ − ৳১১০ = ৳৭০</p>
+        </div>
+        <div class="docs-ex">
+          <div class="ext">উদাহরণ — BUYER লাভ করলে</div>
+          <p>ম্যাচিউরিটিতে দাম কমে ৳১০০ হলো।<br>
+          Buyer gain = (১০৯−১০০)×১০ = ৳৯০<br>
+          Buyer পাবে: ৳১৮০ + ৳৯০ = ৳২৭০ | Seller হারাবে: ৳৯০</p>
+        </div>
+        <div class="info-box">⚠️ ফিউচার কন্ট্র্যাক্টে জামানতের সম্পূর্ণ অর্থ হারানোর ঝুঁকি থাকে। সাধ্যের বাইরে বিনিয়োগ করবেন না।</div>
+      </div>
+    </div>
+  </div></div>
+</div>
 
-    /* ════════════════════════════════════
-       FILTER (overridden by api.js)
-    ════════════════════════════════════ */
-    let activeFilter = 'all', searchTerm = '';
-    function filterCat(cat, btn) {
-      activeFilter = cat;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-    }
-    function filterSearch(q) { searchTerm = q; }
+<!-- ══ LOGIN ══ -->
+<div class="page" id="page-login">
+  <div class="auth-page">
+    <div class="auth-box">
+      <h2>স্বাগতম 👋</h2>
+      <p>আপনার অ্যাকাউন্টে লগইন করুন</p>
+      <div class="form-group"><label>ইমেইল</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" class="form-input" id="loginPass" placeholder="••••••••"></div>
+      <button class="btn btn-solid btn-full mt-8" id="loginBtn2" onclick="handleLogin()">লগইন করুন</button>
+      <div class="auth-switch">নতুন? <a href="#" onclick="showPage('register');return false">রেজিস্ট্রেশন করুন</a></div>
+    </div>
+  </div>
+</div>
 
-    /* ════════════════════════════════════
-       STUBS — overridden by api.js
-    ════════════════════════════════════ */
-    function handleLogin() { showToast('লোড হচ্ছে...', 'info'); }
-    function handleRegister() { showToast('লোড হচ্ছে...', 'info'); }
-    function submitCreateContract() { showToast('লোড হচ্ছে...', 'info'); }
-    function submitBid() { showToast('লোড হচ্ছে...', 'info'); }
-    function submitProposal() { showToast('লোড হচ্ছে...', 'info'); }
-    function submitDeposit() { showToast('লোড হচ্ছে...', 'info'); }
-    function submitWithdraw() { showToast('লোড হচ্ছে...', 'info'); }
-    function submitAddProduct() { showToast('লোড হচ্ছে...', 'info'); }
-    function populateProductDropdown() { }
-    function triggerScrape() { showToast('লোড হচ্ছে...', 'info'); }
-    function triggerSettlement() { showToast('লোড হচ্ছে...', 'info'); }
-    function saveAllPricesAPI() { showToast('লোড হচ্ছে...', 'info'); }
-    function onChartProductChange() { }
-    function setRange(days, btn) {
-      document.querySelectorAll('.rng-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-    }
-    function drawChart() { }
+<!-- ══ REGISTER ══ -->
+<div class="page" id="page-register">
+  <div class="auth-page">
+    <div class="auth-box">
+      <h2>অ্যাকাউন্ট তৈরি করুন</h2>
+      <p>মাত্র নাম ও ইমেইল দিয়ে শুরু করুন</p>
+      <div class="form-group"><label>পুরো নাম</label><input type="text" class="form-input" id="regName" placeholder="আপনার নাম"></div>
+      <div class="form-group"><label>ইমেইল</label><input type="email" class="form-input" id="regEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" class="form-input" id="regPass" placeholder="কমপক্ষে ৬ অক্ষর"></div>
+      <button class="btn btn-solid btn-full mt-8" onclick="handleRegister()">রেজিস্ট্রেশন করুন</button>
+      <div class="auth-switch">ইতোমধ্যে আছেন? <a href="#" onclick="showPage('login');return false">লগইন করুন</a></div>
+    </div>
+  </div>
+</div>
 
-    /* set min date for contract */
-    document.addEventListener('DOMContentLoaded', () => {
-      const d = document.getElementById('cc-date');
-      if (d) d.min = new Date().toISOString().split('T')[0];
-    });
-  </script>
+</main>
 
-  <script src="api.js"></script>
+<footer>
+  <div class="container">
+    <div class="foot-inner">
+      <div class="foot-logo">🌾 BazarFutures</div>
+      <div class="foot-links">
+        <a href="#" onclick="showPage('docs');return false">গাইড</a>
+        <a href="#">শর্তাবলী</a>
+        <a href="#">গোপনীয়তা</a>
+      </div>
+    </div>
+    <div class="foot-copy">© ২০২৬ BazarFutures · সব মূল্য Chaldal.com থেকে · ১% প্ল্যাটফর্ম কমিশন</div>
+  </div>
+</footer>
+
+<!-- ══ MODALS ══ -->
+
+<!-- CREATE CONTRACT -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('createModal')">✕</button>
+    <h3>নতুন কন্ট্র্যাক্ট</h3>
+    <div class="form-group">
+      <label>পণ্য</label>
+      <select class="form-input" id="cc-product" onchange="calcSecurity()">
+        <option value="">পণ্য বেছে নিন</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>পরিমাণ (ইউনিট)</label>
+        <input type="number" class="form-input" id="cc-qty" placeholder="যেমন: ১০" oninput="calcSecurity()" min="1" step="1">
+      </div>
+      <div class="form-group">
+        <label>চুক্তির দাম (৳)</label>
+        <input type="number" class="form-input" id="cc-price" placeholder="যেমন: ১২০" oninput="calcSecurity()" min="0" step="0.5">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>ম্যাচিউরিটি তারিখ</label>
+      <input type="date" class="form-input" id="cc-date">
+    </div>
+    <div class="form-group">
+      <label>ধরন</label>
+      <select class="form-input" id="cc-type">
+        <option value="sell">SELL — আমি বিক্রি করব</option>
+        <option value="buy">BUY — আমি কিনব</option>
+      </select>
+    </div>
+    <div class="sec-calc" id="secCalc">
+      <div class="sc-row"><span>মোট মূল্য</span><span id="sc-total">৳০</span></div>
+      <div class="sc-row"><span>জামানত হার</span><span>১৫%</span></div>
+      <div class="sc-row total"><span>প্রদেয় জামানত</span><span id="sc-sec">৳০</span></div>
+    </div>
+    <div class="form-group mt-16">
+      <label>বিশেষ শর্ত (ঐচ্ছিক)</label>
+      <textarea class="form-input" id="cc-terms" rows="2" placeholder="বিশেষ শর্ত..."></textarea>
+    </div>
+    <button class="btn btn-solid btn-full mt-8" onclick="submitCreateContract()">কন্ট্র্যাক্ট তৈরি করুন →</button>
+  </div>
+</div>
+
+<!-- BID MODAL -->
+<div class="modal-overlay" id="bidModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('bidModal')">✕</button>
+    <h3 id="bidModalTitle">বিড করুন</h3>
+    <div class="bid-list" id="existingBids"></div>
+    <div class="divider"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>বিডের দাম (৳)</label>
+        <input type="number" class="form-input" id="bid-price" placeholder="দাম লিখুন" step="0.5">
+      </div>
+      <div class="form-group">
+        <label>পরিমাণ</label>
+        <input type="number" class="form-input" id="bid-qty" placeholder="পরিমাণ">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>কাস্টম তারিখ (ঐচ্ছিক)</label>
+      <input type="date" class="form-input" id="bid-date">
+    </div>
+    <div class="form-group">
+      <label>বার্তা</label>
+      <textarea class="form-input" id="bid-msg" rows="2" placeholder="Seller কে বার্তা..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-solid" style="flex:1" onclick="submitBid()">বিড করুন</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="submitProposal()">📩 প্রপোজাল</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEPOSIT -->
+<div class="modal-overlay" id="depositModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
+    <h3>টাকা জমা করুন</h3>
+    <div class="pm-grid">
+      <div class="pm-btn sel" onclick="selPM(this,'bkash')"><div class="pm-icon">📱</div>বিকাশ</div>
+      <div class="pm-btn" onclick="selPM(this,'nagad')"><div class="pm-icon">💚</div>নগদ</div>
+      <div class="pm-btn" onclick="selPM(this,'rocket')"><div class="pm-icon">🟣</div>রকেট</div>
+      <div class="pm-btn" onclick="selPM(this,'bank')"><div class="pm-icon">🏦</div>ব্যাংক</div>
+    </div>
+    <input type="hidden" id="dep-pm" value="bkash">
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" class="form-input" id="dep-amount" placeholder="ন্যূনতম ৳৫০০" min="500"></div>
+    <div class="form-group"><label>আপনার নম্বর</label><input type="text" class="form-input" id="dep-acc" placeholder="01XXXXXXXXX"></div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px;margin:12px 0;font-size:0.84rem;color:var(--text-mid)">
+      📌 এই নম্বরে পাঠান: <strong class="mono">01XXXXXXXX (BazarFutures)</strong><br>তারপর TrxID দিন
+    </div>
+    <div class="form-group"><label>ট্রানজেকশন ID (TrxID)</label><input type="text" class="form-input" id="dep-txn" placeholder="যেমন: AB1234567"></div>
+    <button class="btn btn-solid btn-full" onclick="submitDeposit()">জমার আবেদন করুন</button>
+  </div>
+</div>
+
+<!-- WITHDRAW -->
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('withdrawModal')">✕</button>
+    <h3>টাকা তুলুন</h3>
+    <div class="pm-grid">
+      <div class="pm-btn sel" onclick="selPM(this,'bkash')"><div class="pm-icon">📱</div>বিকাশ</div>
+      <div class="pm-btn" onclick="selPM(this,'nagad')"><div class="pm-icon">💚</div>নগদ</div>
+      <div class="pm-btn" onclick="selPM(this,'rocket')"><div class="pm-icon">🟣</div>রকেট</div>
+      <div class="pm-btn" onclick="selPM(this,'bank')"><div class="pm-icon">🏦</div>ব্যাংক</div>
+    </div>
+    <input type="hidden" id="wd-pm" value="bkash">
+    <div class="form-group"><label>পরিমাণ (৳)</label><input type="number" class="form-input" id="wd-amount" placeholder="ন্যূনতম ৳২০০" min="200"></div>
+    <div class="form-group"><label>আপনার নম্বর</label><input type="text" class="form-input" id="wd-acc" placeholder="01XXXXXXXXX"></div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px;margin:12px 0;font-size:0.82rem;color:var(--text-dim)">
+      ১-২ কার্যদিবসে প্রক্রিয়া হবে · চার্জ: ০%
+    </div>
+    <button class="btn btn-solid btn-full" onclick="submitWithdraw()">উইথড্র আবেদন করুন</button>
+  </div>
+</div>
+
+<!-- ADD PRODUCT -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
+    <h3>নতুন পণ্য যোগ করুন</h3>
+    <div class="form-group"><label>পণ্যের নাম (বাংলা)</label><input class="form-input" id="np-bn" placeholder="যেমন: ব্রয়লার ডিম"></div>
+    <div class="form-group"><label>পণ্যের নাম (ইংরেজি)</label><input class="form-input" id="np-en" placeholder="Broiler Eggs"></div>
+    <div class="form-row">
+      <div class="form-group"><label>ইউনিট</label><input class="form-input" id="np-unit" placeholder="12 pcs"></div>
+      <div class="form-group"><label>ক্যাটাগরি</label>
+        <select class="form-input" id="np-cat">
+          <option value="সবজি">সবজি</option><option value="ফল">ফল</option>
+          <option value="ডাল/চাল">ডাল/চাল</option><option value="মশলা">মশলা</option>
+          <option value="ডেইরি">ডেইরি</option><option value="অন্যান্য">অন্যান্য</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>বর্তমান দাম (৳)</label><input type="number" class="form-input" id="np-price" placeholder="Chaldal দাম"></div>
+      <div class="form-group"><label>Chaldal URL</label><input class="form-input" id="np-url" placeholder="https://chaldal.com/..."></div>
+    </div>
+    <button class="btn btn-solid btn-full" onclick="submitAddProduct()">পণ্য যোগ করুন</button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════
+   CORE: PAGE SWITCHING
+════════════════════════════════════ */
+let _currentPage = 'home';
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + id);
+  if (el) { el.classList.add('active'); _currentPage = id; }
+
+  // Desktop nav
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const nl = document.getElementById('nl-' + id);
+  if (nl) nl.classList.add('active');
+
+  // Mobile nav
+  document.querySelectorAll('.mnav-item').forEach(b => b.classList.remove('active'));
+  const mn = document.getElementById('mn-' + id);
+  if (mn) mn.classList.add('active');
+
+  window.scrollTo(0, 0);
+}
+
+/* ════════════════════════════════════
+   MODALS
+════════════════════════════════════ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (id === 'createModal') populateProductDropdown();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
+
+/* ════════════════════════════════════
+   PAYMENT METHOD SELECTOR
+════════════════════════════════════ */
+let _depPM = 'bkash', _wdPM = 'bkash';
+function selPM(btn, pm) {
+  const grid = btn.closest('.pm-grid');
+  grid.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const hiddenId = btn.closest('.modal').querySelector('input[type=hidden]')?.id;
+  if (hiddenId) document.getElementById(hiddenId).value = pm;
+}
+
+/* ════════════════════════════════════
+   SECURITY CALCULATOR
+════════════════════════════════════ */
+function calcSecurity() {
+  const qty   = parseFloat(document.getElementById('cc-qty')?.value) || 0;
+  const price = parseFloat(document.getElementById('cc-price')?.value) || 0;
+  const total = qty * price;
+  const sec   = Math.round(total * 0.15 * 100) / 100;
+  if (document.getElementById('sc-total')) document.getElementById('sc-total').textContent = '৳' + total.toFixed(2);
+  if (document.getElementById('sc-sec'))   document.getElementById('sc-sec').textContent   = '৳' + sec.toFixed(2);
+}
+
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
+function showToast(msg, type = 'info') {
+  const wrap = document.getElementById('toastWrap');
+  const t    = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon  = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  t.innerHTML = `<span>${icon}</span><span style="flex:1">${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+/* ════════════════════════════════════
+   ADMIN TAB SWITCHER
+════════════════════════════════════ */
+function switchAdminTab(tab, btn) {
+  ['prices','products','contracts','users','withdrawals'].forEach(t => {
+    const el = document.getElementById('at-' + t);
+    if (el) el.style.display = t === tab ? '' : 'none';
+  });
+  document.querySelectorAll('.atab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+/* ════════════════════════════════════
+   CONTRACT TAB SWITCHER (static)
+════════════════════════════════════ */
+function switchTab(status, btn) {
+  // overridden by api.js
+}
+
+/* ════════════════════════════════════
+   FILTER (overridden by api.js)
+════════════════════════════════════ */
+let activeFilter = 'all', searchTerm = '';
+function filterCat(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+function filterSearch(q) { searchTerm = q; }
+
+/* ════════════════════════════════════
+   STUBS — overridden by api.js
+════════════════════════════════════ */
+function handleLogin()    { showToast('লোড হচ্ছে...','info'); }
+function handleRegister() { showToast('লোড হচ্ছে...','info'); }
+function submitCreateContract() { showToast('লোড হচ্ছে...','info'); }
+function submitBid()     { showToast('লোড হচ্ছে...','info'); }
+function submitProposal(){ showToast('লোড হচ্ছে...','info'); }
+function submitDeposit() { showToast('লোড হচ্ছে...','info'); }
+function submitWithdraw(){ showToast('লোড হচ্ছে...','info'); }
+function submitAddProduct(){ showToast('লোড হচ্ছে...','info'); }
+function populateProductDropdown() {}
+function triggerScrape()    { showToast('লোড হচ্ছে...','info'); }
+function triggerSettlement(){ showToast('লোড হচ্ছে...','info'); }
+function saveAllPricesAPI() { showToast('লোড হচ্ছে...','info'); }
+function onChartProductChange() {}
+function setRange(days, btn) {
+  document.querySelectorAll('.rng-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+function drawChart() {}
+
+/* set min date for contract */
+document.addEventListener('DOMContentLoaded', () => {
+  const d = document.getElementById('cc-date');
+  if (d) d.min = new Date().toISOString().split('T')[0];
+});
+</script>
+
+<script src="api.js"></script>
 </body>
-
 </html>
