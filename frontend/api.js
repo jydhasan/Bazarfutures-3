@@ -102,6 +102,7 @@ const A = {
   allConts:   () => api('/admin/contracts'),
   toggleUser: id => api(`/admin/users/${id}/toggle`, {method:'PATCH'}),
   scrape:     () => api('/admin/trigger-scrape',     {method:'POST'}),
+  previewScrape: () => api('/admin/preview-scrape',  {method:'POST'}),
   settle:     () => api('/admin/trigger-settlement', {method:'POST'}),
 };
 
@@ -662,7 +663,7 @@ function renderAdminPrices(prods) {
       <td class="mono" style="font-size:0.78rem">${p.unit}</td>
       <td class="mono">৳${price}</td>
       <td><div style="display:flex;gap:6px;align-items:center">
-        <input class="price-edit-input" type="number" value="${price}" id="pi-${p.id}" step="0.5" min="0">
+        <input class="price-edit-input" type="number" value="${price}" id="pi-${p.id}" data-old-price="${price}" step="0.5" min="0">
       </div></td>
       <td><button class="btn btn-solid btn-xs" onclick="saveSinglePrice(${p.id})">সেভ</button></td>
     </tr>`;
@@ -771,8 +772,26 @@ window.rejectTxn = async function(id) {
 
 window.triggerScrape = async function() {
   showToast('⏳ Chaldal থেকে দাম আনছে...','info');
-  const r = await A.scrape();
-  if (r) { showToast('✅ '+r.message,'success'); setTimeout(loadAdmin, 2000); }
+  const r = await A.previewScrape();
+  if (r) {
+    const byId = {};
+    (r.updates || []).forEach(u => { byId[u.product_id] = u; });
+
+    let changed = 0, missing = 0;
+    document.querySelectorAll('.price-edit-input').forEach(inp => {
+      const id = parseInt(inp.id.replace('pi-',''));
+      const data = byId[id];
+      if (!data || data.new_price == null) {
+        missing += 1;
+        return;
+      }
+      const oldPrice = parseFloat(inp.dataset.oldPrice || inp.value || 0);
+      inp.value = data.new_price;
+      if (data.new_price !== oldPrice) changed += 1;
+    });
+
+    showToast(`✅ ফেচ শেষ: ${changed}টি নতুন দাম বসানো হয়েছে, ${missing}টি পাওয়া যায়নি`,'success');
+  }
 };
 window.triggerSettlement = async function() {
   showToast('⏳ Settlement শুরু হচ্ছে...','info');
