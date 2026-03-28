@@ -5,7 +5,8 @@ from sqlalchemy import func
 
 from database import get_db
 from auth import get_current_admin
-import models, schemas
+import models
+import schemas
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -15,23 +16,27 @@ def dashboard_stats(
     db: Session = Depends(get_db),
     _: models.User = Depends(get_current_admin),
 ):
-    total_users      = db.query(func.count(models.User.id)).scalar()
-    total_products   = db.query(func.count(models.Product.id)).filter(models.Product.is_active == True).scalar()
-    open_contracts   = db.query(func.count(models.Contract.id)).filter(models.Contract.status == "open").scalar()
-    matched          = db.query(func.count(models.Contract.id)).filter(models.Contract.status == "matched").scalar()
-    settled          = db.query(func.count(models.Contract.id)).filter(models.Contract.status == "settled").scalar()
+    total_users = db.query(func.count(models.User.id)).scalar()
+    total_products = db.query(func.count(models.Product.id)).filter(
+        models.Product.is_active == True).scalar()
+    open_contracts = db.query(func.count(models.Contract.id)).filter(
+        models.Contract.status == "open").scalar()
+    matched = db.query(func.count(models.Contract.id)).filter(
+        models.Contract.status == "matched").scalar()
+    settled = db.query(func.count(models.Contract.id)).filter(
+        models.Contract.status == "settled").scalar()
     pending_deposits = db.query(func.count(models.Transaction.id)).filter(
         models.Transaction.txn_type == models.TransactionType.deposit,
-        models.Transaction.status   == models.TransactionStatus.pending,
+        models.Transaction.status == models.TransactionStatus.pending,
     ).scalar()
     pending_withdrawals = db.query(func.count(models.Transaction.id)).filter(
         models.Transaction.txn_type == models.TransactionType.withdrawal,
-        models.Transaction.status   == models.TransactionStatus.pending,
+        models.Transaction.status == models.TransactionStatus.pending,
     ).scalar()
 
     total_commission = db.query(func.sum(models.Transaction.amount)).filter(
         models.Transaction.txn_type == models.TransactionType.commission,
-        models.Transaction.status   == models.TransactionStatus.completed,
+        models.Transaction.status == models.TransactionStatus.completed,
     ).scalar() or 0
 
     return {
@@ -71,10 +76,13 @@ def toggle_user(
 
 @router.post("/trigger-scrape")
 def trigger_scrape(
+    background_tasks: BackgroundTasks,
     _: models.User = Depends(get_current_admin),
 ):
     """Manually trigger Chaldal price scrape."""
     from scraper import run_price_update
+    background_tasks.add_task(run_price_update)
+    return {"message": "স্ক্র্যাপিং শুরু হয়েছে (ব্যাকগ্রাউন্ডে চলছে)"}
     result = run_price_update()
     if result.get("error"):
         raise HTTPException(500, f"স্ক্র্যাপিং ব্যর্থ: {result['error']}")

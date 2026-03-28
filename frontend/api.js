@@ -675,13 +675,10 @@ window.saveSinglePrice = async function(id) {
   if (!inp) return;
   const np = parseFloat(inp.value);
   if (!np||np<=0) { showToast('সঠিক দাম দিন','error'); return; }
-  const oldPrice = parseFloat(inp.dataset.oldPrice || 0);
-  if (oldPrice && np === oldPrice) { showToast('এই পণ্যের নতুন দাম পরিবর্তন হয়নি','info'); return; }
   const r = await A.updateProd(id, {current_price:np});
   if (r) {
     showToast('✅ দাম আপডেট: ৳'+np,'success');
     if (_prodMap[id]) _prodMap[id].price = np;
-    await loadAdmin();
   }
 };
 
@@ -691,8 +688,7 @@ window.saveAllPricesAPI = async function() {
   inputs.forEach(inp => {
     const id = parseInt(inp.id.replace('pi-',''));
     const p  = parseFloat(inp.value);
-    const oldPrice = parseFloat(inp.dataset.oldPrice || 0);
-    if (id && p>0 && p !== oldPrice) updates.push({product_id:id, new_price:p});
+    if (id && p>0) updates.push({product_id:id, new_price:p});
   });
   if (!updates.length) { showToast('কোনো পরিবর্তন নেই','error'); return; }
   const r = await A.bulkPrice(updates);
