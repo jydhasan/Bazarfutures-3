@@ -1,0 +1,99 @@
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+
+from database import get_db
+from auth import get_current_admin
+import models, schemas
+
+router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+
+@router.get("/stats")
+def dashboard_stats(
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_admin),
+):
+    total_users      = db.query(func.count(models.User.id)).scalar()
+    total_products   = db.query(func.count(models.Product.id)).filter(models.Product.is_active == True).scalar()
+    open_contracts   = db.query(func.count(models.Contract.id)).filter(models.Contract.status == "open").scalar()
+    matched          = db.query(func.count(models.Contract.id)).filter(models.Contract.status == "matched").scalar()
+    settled          = db.query(func.count(models.Contract.id)).filter(models.Contract.status == "settled").scalar()
+    pending_deposits = db.query(func.count(models.Transaction.id)).filter(
+        models.Transaction.txn_type == models.TransactionType.deposit,
+        models.Transaction.status   == models.TransactionStatus.pending,
+    ).scalar()
+    pending_withdrawals = db.query(func.count(models.Transaction.id)).filter(
+        models.Transaction.txn_type == models.TransactionType.withdrawal,
+        models.Transaction.status   == models.TransactionStatus.pending,
+    ).scalar()
+
+    total_commission = db.query(func.sum(models.Transaction.amount)).filter(
+        models.Transaction.txn_type == models.TransactionType.commission,
+        models.Transaction.status   == models.TransactionStatus.completed,
+    ).scalar() or 0
+
+    return {
+        "total_users":          total_users,
+        "total_products":       total_products,
+        "open_contracts":       open_contracts,
+        "matched_contracts":    matched,
+        "settled_contracts":    settled,
+        "pending_deposits":     pending_deposits,
+        "pending_withdrawals":  pending_withdrawals,
+        "total_commission":     float(total_commission),
+    }
+
+
+@router.get("/users", response_model=List[schemas.UserOut])
+def list_users(
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_admin),
+):
+    return db.query(models.User).order_by(models.User.created_at.desc()).all()
+
+
+@router.patch("/users/{user_id}/toggle", response_model=schemas.UserOut)
+def toggle_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_admin),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "ব্যবহারকারী পাওয়া যায়নি")
+    user.is_active = not user.is_active
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.post("/trigger-scrape")
+def trigger_scrape(
+    background_tasks: BackgroundTasks,
+    _: models.User = Depends(get_current_admin),
+):
+    """Manually trigger Chaldal price scrape."""
+    from scraper import run_price_update
+    background_tasks.add_task(run_price_update)
+    return {"message": "স্ক্র্যাপিং শুরু হয়েছে (ব্যাকগ্রাউন্ডে চলছে)"}
+
+
+@router.post("/trigger-settlement")
+def trigger_settlement(
+    background_tasks: BackgroundTasks,
+    _: models.User = Depends(get_current_admin),
+):
+    """Manually trigger settlement for today's matured contracts."""
+    from scraper import run_settlement_job
+    background_tasks.add_task(run_settlement_job)
+    return {"message": "সেটেলমেন্ট জব শুরু হয়েছে"}
+
+
+@router.get("/contracts", response_model=List[schemas.ContractOut])
+def all_contracts(
+    db: Session = Depends(get_db),
+    _: models.User = Depends(get_current_admin),
+):
+    return db.query(models.Contract).order_by(models.Contract.created_at.desc()).all()
